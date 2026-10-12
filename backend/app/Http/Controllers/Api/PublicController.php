@@ -1,0 +1,109 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\ContactMessage;
+use App\Models\Course;
+use App\Models\Inquiry;
+use App\Models\NewsletterSubscriber;
+use App\Models\PaymentAccount;
+use App\Models\Program;
+use App\Models\Setting;
+use App\Models\User;
+use App\Support\Activity;
+use Illuminate\Http\Request;
+
+class PublicController extends Controller
+{
+    protected function courseCard($q)
+    {
+        return $q->with(['program:id,name,slug', 'level:id,name,slug', 'teachers:id,name,username,designation,avatar'])
+            ->where('status', 'published')->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function site()
+    {
+        return response()->json([
+            'settings' => Setting::allPublic(),
+            'programs' => Program::where('status', 'active')->orderBy('sort_order')
+                ->with(['levels' => fn ($q) => $q->withCount(['courses' => fn ($c) => $c->where('status', 'published')]), 'examSessions' => fn ($q) => $q->where('status', 'open')])->get(),
+            'payment_accounts' => PaymentAccount::where('is_active', true)->orderBy('sort_order')->get(),
+        ]);
+    }
+
+    public function courses(Request $request)
+    {
+        $q = $this->courseCard(Course::query());
+        if ($request->program) $q->whereHas('program', fn ($p) => $p->where('slug', $request->program));
+        if ($request->level) $q->whereHas('level', fn ($p) => $p->where('slug', $request->level));
+        if ($request->featured) $q->where('is_featured', true);
+        if ($s = $request->search) $q->where(fn ($w) => $w->where('title', 'like', "%$s%")->orWhere('code', 'like', "%$s%"));
+        return response()->json($q->get()->makeHidden(['about', 'learn', 'structure']));
+    }
+
+    public function course(string $slug)
+    {
+        $course = $this->courseCard(Course::query())->where('slug', $slug)->firstOrFail();
+        $course->loadCount(['lessons' => fn ($q) => $q->where('is_published', true)]);
+        $course->load(['lessons' => fn ($q) => $q->where('is_published', true)->select('id', 'course_id', 'chapter', 'title', 'type', 'duration_minutes', 'sort_order')]);
+        $related = $this->courseCard(Course::query())->where('level_id', $course->level_id)->where('id', '!=', $course->id)->limit(4)->get()->makeHidden(['about', 'learn', 'structure']);
+        $sessions = $course->program->examSessions()->where('status', 'open')->get();
+        return response()->json(['course' => $course, 'related' => $related, 'sessions' => $sessions]);
+    }
+
+    public function program(string $slug)
+    {
+        $program = Program::where('slug', $slug)->where('status', 'active')
+            ->with(['levels.courses' => fn ($q) => $q->where('status', 'published')->with('teachers:id,name,username,avatar')->select('id', 'program_id', 'level_id', 'code', 'slug', 'title', 'short_description', 'fee', 'scholarship_fee', 'exam_duration', 'pass_mark', 'is_purchasable', 'status', 'image', 'sort_order'), 'examSessions'])
+            ->firstOrFail();
+        return response()->json($program);
+    }
+
+    public function faculty()
+    {
+        return response()->json(User::where('role', 'teacher')->where('status', 'active')
+            ->with(['teachingCourses' => fn ($q) => $q->where('status', 'published')->select('courses.id', 'code', 'title', 'slug', 'program_id')])
+            ->get(['id', 'name', 'username', 'designation', 'specialization', 'bio', 'avatar', 'qualification']));
+    }
+
+    public function teacher(string $username)
+    {
+        $t = User::where('role', 'teacher')->where('username', $username)->where('status', 'active')
+            ->with(['teachingCourses' => fn ($q) => $q->where('status', 'published')->with('program:id,name,slug')])
+            ->firstOrFail(['id', 'name', 'username', 'designation', 'specialization', 'bio', 'avatar', 'qualification']);
+        return response()->json($t);
+    }
+
+    public function contact(Request $request)
+    {
+        $data = $request->validate(['name' => 'required|max:120', 'email' => 'required|email', 'phone' => 'nullable|max:30', 'subject' => 'nullable|max:200', 'message' => 'required|max:5000']);
+        $m = ContactMessage::create($data + ['ip' => $request->ip()]);
+        Activity::log('contact.submit', "Contact message from {$m->email}", $m);
+        return response()->json(['message' => 'Thank you! Our admissions team will get back to you shortly.']);
+    }
+
+    public function inquiry(Request $request)
+    {
+        $data = $request->validate(['name' => 'required|max:120', 'email' => 'required|email', 'phone' => 'required|max:30', 'program' => 'nullable|max:50', 'qualification' => 'nullable|max:150', 'city' => 'nullable|max:80', 'message' => 'nullable|max:3000']);
+        $m = Inquiry::create($data + ['ip' => $request->ip()]);
+        Activity::log('inquiry.submit', "Admission inquiry from {$m->email}", $m);
+        return response()->json(['message' => 'Your admission inquiry has been received. A counsellor will call you soon.']);
+    }
+
+    public function newsletter(Request $request)
+    {
+        $data = $request->validate(['email' => 'required|email']);
+        $s = NewsletterSubscriber::firstOrCreate(['email' => $data['email']], ['ip' => $request->ip()]);
+        Activity::log('newsletter.subscribe', "Newsletter subscribe {$s->email}", $s);
+        return response()->json(['message' => 'Subscribed! You will receive updates from Leads College of Accountancy.']);
+    }
+
+    /** Records page views from the SPA so every visit is stored in the DB. */
+    public function track(Request $request)
+    {
+        $request->validate(['path' => 'required|string|max:500', 'title' => 'nullable|string|max:300', 'referrer' => 'nullable|string|max:500']);
+        Activity::log('page.view', $request->path, null, ['path' => $request->path, 'title' => $request->title, 'referrer' => $request->referrer]);
+        return response()->noContent();
+    }
+}

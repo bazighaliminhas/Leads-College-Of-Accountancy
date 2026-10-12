@@ -1,0 +1,1227 @@
+{
+ "programs": [
+  {
+   "name": "ACCA",
+   "slug": "acca",
+   "full_name": "Association of Chartered Certified Accountants (ACCA)",
+   "awarding_body": "ACCA, United Kingdom",
+   "tagline": "A globally recognised accountancy qualification \u2014 from Foundation to Strategic Professional.",
+   "description": "The ACCA route starts with a short ladder of computer-based exams. You can enter at the level that matches your background, and no previous qualification is needed for the Intermediate Certificate or the Diploma. Students with no accounting background are advised to begin with FA1 and MA1.",
+   "registration_fee": 10000,
+   "registration_fee_scholarship": null,
+   "registration_no_label": "ACCA Registration Number",
+   "overview": [
+    {
+     "title": "Foundations in Accountancy (FIA) and Knowledge level",
+     "paragraphs": [
+      "The ACCA route starts with a short ladder of computer-based exams. You can enter at the level that matches your background, and no previous qualification is needed for the Intermediate Certificate or the Diploma. Students with no accounting background are advised to begin with FA1 and MA1."
+     ],
+     "bullets": [
+      "Introductory Certificate in Financial and Management Accounting: FA1 and MA1",
+      "Intermediate Certificate in Financial and Management Accounting: FA2 and MA2",
+      "Diploma in Accounting and Business (FIA) and Applied Knowledge (ACCA Qualification): BT/FBT, MA/FMA and FA/FFA"
+     ]
+    },
+    {
+     "title": "Applied Skills level",
+     "paragraphs": [
+      "Applied Skills is the second level of the ACCA Qualification. It moves from objective tests to a mix of objective test questions and written or calculated answers. Corporate and Business Law (LW) is on demand, and the other five exams are held in four sessions a year. Students complete Applied Knowledge before Applied Skills."
+     ],
+     "bullets": []
+    },
+    {
+     "title": "Strategic Professional level",
+     "paragraphs": [
+      "Strategic Professional is the final exam level. Students complete two compulsory Essentials papers, SBL and SBR, and then choose Options papers. All exams are computer-based, use long scenario-based questions and are held in four sessions a year. Every exam awards professional skills marks for how well you analyse, communicate and use judgement."
+     ],
+     "bullets": []
+    }
+   ],
+   "levels": [
+    {
+     "slug": "foundation",
+     "name": "Foundation Level (FIA / Applied Knowledge)",
+     "description": "Computer-based exams available on demand. Students with no accounting background begin with FA1 and MA1.",
+     "sort": 0,
+     "courses": [
+      {
+       "code": "FA1",
+       "display_code": "FA1",
+       "title": "Recording Financial Transactions",
+       "about": "FA1 is the starting point of the route and assumes no prior accounting knowledge. It teaches how a business records its everyday financial transactions, from the documents it receives to the entries in its accounting records. It gives you the language and bookkeeping skills that every later accounting exam builds on.",
+       "short": "FA1 is the starting point of the route and assumes no prior accounting knowledge.",
+       "learn": [
+        "How businesses and their accounting function work",
+        "Source documents and the books where transactions are first recorded",
+        "Double-entry bookkeeping and ledger accounts",
+        "Recording sales, purchases, cash and bank transactions",
+        "Preparing and checking a trial balance"
+       ],
+       "structure": [
+        "Computer-based exam, available on demand",
+        "50 multiple-choice questions, 2 marks each, 100 marks in total",
+        "Duration: 2 hours",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "2 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, available on demand",
+       "fee": 15000,
+       "scholarship_fee": null,
+       "sort": 0
+      },
+      {
+       "code": "MA1",
+       "display_code": "MA1",
+       "title": "Management Information",
+       "about": "MA1 introduces the way organisations collect and use cost information to plan, control and make decisions. It is the management accounting counterpart to FA1 and, like FA1, is designed for students who are new to the subject.",
+       "short": "MA1 introduces the way organisations collect and use cost information to plan, control and make decisions.",
+       "learn": [
+        "The purpose of management information and who uses it",
+        "Classifying costs and understanding how they behave",
+        "Recording and accounting for materials, labour and overheads",
+        "Basic costing techniques",
+        "Using cost information to support simple business decisions"
+       ],
+       "structure": [
+        "Computer-based exam, available on demand",
+        "50 multiple-choice questions, 2 marks each, 100 marks in total",
+        "Duration: 2 hours",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "2 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, available on demand",
+       "fee": 15000,
+       "scholarship_fee": null,
+       "sort": 1
+      },
+      {
+       "code": "FA2",
+       "display_code": "FA2",
+       "title": "Maintaining Financial Records",
+       "about": "FA2 builds on FA1. It moves from recording individual transactions to maintaining a complete set of accounting records and producing financial statements. It suits students who have completed FA1 and students with some accounting background.",
+       "short": "FA2 builds on FA1.",
+       "learn": [
+        "Non-current assets and depreciation",
+        "Inventory",
+        "Receivables, payables and year-end adjustments such as accruals and prepayments",
+        "Control accounts and reconciliations",
+        "Preparing financial statements"
+       ],
+       "structure": [
+        "Computer-based exam, available on demand",
+        "50 questions, 2 marks each, 100 marks in total",
+        "Question types: multiple choice, multiple response, multiple response matching and number entry",
+        "Duration: 2 hours",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "2 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, available on demand",
+       "fee": 15000,
+       "scholarship_fee": null,
+       "sort": 2
+      },
+      {
+       "code": "MA2",
+       "display_code": "MA2",
+       "title": "Managing Costs and Finance",
+       "about": "MA2 builds on MA1. It looks at how organisations manage their costs, plan with budgets and raise the finance they need. It is the second management accounting step before the Diploma.",
+       "short": "MA2 builds on MA1.",
+       "learn": [
+        "Costing methods and techniques",
+        "Budgeting and comparing actual results with plans",
+        "Using cost information in decision-making",
+        "Sources of short-term and long-term finance"
+       ],
+       "structure": [
+        "Computer-based exam, available on demand",
+        "50 questions, 2 marks each, 100 marks in total",
+        "Question types: multiple choice, multiple response, multiple response matching and number entry",
+        "Duration: 2 hours",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "2 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, available on demand",
+       "fee": 15000,
+       "scholarship_fee": null,
+       "sort": 3
+      },
+      {
+       "code": "FBT",
+       "display_code": "BT / FBT",
+       "title": "Business and Technology",
+       "about": "Business and Technology gives you the big picture of how organisations work. It covers how businesses are structured, governed and controlled, how accounting and technology support them, and the standards of professional behaviour expected of accountants. It is the broadest and most descriptive of the three Diploma exams.",
+       "short": "Business and Technology gives you the big picture of how organisations work.",
+       "learn": [
+        "How organisations are structured, run and governed",
+        "The role of the accounting function, systems and internal controls",
+        "How technology and information systems are used in business",
+        "Communication and personal effectiveness at work",
+        "Professional ethics and conduct"
+       ],
+       "structure": [
+        "Computer-based exam, available on demand",
+        "100 marks, two compulsory sections",
+        "Section A: 46 objective test questions worth 76 marks",
+        "Section B: six multi-task questions worth 4 marks each (24 marks)",
+        "Duration: 2 hours",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "2 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, available on demand",
+       "fee": 15000,
+       "scholarship_fee": null,
+       "sort": 4
+      },
+      {
+       "code": "FFA",
+       "display_code": "FA / FFA",
+       "title": "Financial Accounting",
+       "about": "Financial Accounting takes you from double-entry bookkeeping through to complete financial statements and their interpretation. It is the foundation for Financial Reporting at the Applied Skills level.",
+       "short": "Financial Accounting takes you from double-entry bookkeeping through to complete financial statements and their interpretation.",
+       "learn": [
+        "The accounting framework and double-entry bookkeeping",
+        "Ledgers, the trial balance and period-end adjustments",
+        "Preparing financial statements for sole traders and companies",
+        "Statements of cash flows",
+        "Interpreting financial statements using ratios"
+       ],
+       "structure": [
+        "Computer-based exam, available on demand",
+        "100 marks, two compulsory sections",
+        "Section A: 35 objective test questions worth 70 marks",
+        "Section B: two multi-task questions worth 15 marks each (30 marks)",
+        "Duration: 2 hours",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "2 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, available on demand",
+       "fee": 15000,
+       "scholarship_fee": null,
+       "sort": 5
+      },
+      {
+       "code": "FMA",
+       "display_code": "MA / FMA",
+       "title": "Management Accounting",
+       "about": "Management Accounting teaches the techniques managers use to understand costs, set budgets and measure performance. It builds on the ideas introduced in MA1 and MA2 and prepares you for Performance Management at the next level.",
+       "short": "Management Accounting teaches the techniques managers use to understand costs, set budgets and measure performance.",
+       "learn": [
+        "The nature and purpose of management accounting",
+        "Cost classification, behaviour and costing techniques",
+        "Budgeting and forecasting",
+        "Standard costing and variances",
+        "Performance measurement"
+       ],
+       "structure": [
+        "Computer-based exam, available on demand",
+        "100 marks, two compulsory sections",
+        "Section A: 35 objective test questions worth 70 marks",
+        "Section B: three multi-task questions worth 10 marks each (30 marks)",
+        "Duration: 2 hours",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "2 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, available on demand",
+       "fee": 15000,
+       "scholarship_fee": null,
+       "sort": 6
+      }
+     ]
+    },
+    {
+     "slug": "skills",
+     "name": "Skills Level (Applied Skills)",
+     "description": "A mix of objective test questions and written or calculated answers. LW is on demand; the other five exams are held in four sessions a year.",
+     "sort": 1,
+     "courses": [
+      {
+       "code": "PM",
+       "display_code": "PM",
+       "title": "Performance Management",
+       "about": "Performance Management builds on Management Accounting. It teaches how organisations plan, control and evaluate performance, and how managers use financial and non-financial information to make better decisions.",
+       "short": "Performance Management builds on Management Accounting.",
+       "learn": [
+        "Specialist cost and management accounting techniques",
+        "Decision-making techniques, including relevant costing and the treatment of risk",
+        "Budgeting, standard costing and variance analysis",
+        "Financial and non-financial performance measures",
+        "Control and the behavioural effects of performance systems"
+       ],
+       "structure": [
+        "Computer-based session exam (March, June, September and December)",
+        "Duration: 3 hours, 100 marks, all questions compulsory",
+        "Section A: 15 objective test questions, 2 marks each (30 marks)",
+        "Section B: three objective test cases worth 10 marks each, five questions per case (30 marks)",
+        "Section C: two constructed response questions worth 20 marks each (40 marks)",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based session exam (March, June, September and December)",
+       "fee": 20000,
+       "scholarship_fee": null,
+       "sort": 0
+      },
+      {
+       "code": "TX",
+       "display_code": "TX",
+       "title": "Taxation",
+       "about": "Taxation teaches how tax applies to individuals, businesses and companies, and how to calculate and advise on tax liabilities. The exam is set in country-specific versions, so students study the tax rules of one jurisdiction.",
+       "short": "Taxation teaches how tax applies to individuals, businesses and companies, and how to calculate and advise on tax liabilities.",
+       "learn": [
+        "Income tax on employment, self-employment and investment income",
+        "Capital gains",
+        "Corporate tax",
+        "Sales or value-added tax",
+        "Tax administration and basic tax planning"
+       ],
+       "structure": [
+        "Computer-based session exam (March, June, September and December)",
+        "Duration: 3 hours, 100 marks, all questions compulsory",
+        "Section A: 15 objective test questions, 2 marks each (30 marks)",
+        "Section B: three objective test cases worth 10 marks each, five questions per case (30 marks)",
+        "Section C: three constructed response questions, one worth 10 marks and two worth 15 marks each (40 marks)",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based session exam (March, June, September and December)",
+       "fee": 20000,
+       "scholarship_fee": null,
+       "sort": 1
+      },
+      {
+       "code": "FR",
+       "display_code": "FR",
+       "title": "Financial Reporting",
+       "about": "Financial Reporting teaches how to prepare financial statements under International Financial Reporting Standards, for single companies and for groups, and how to interpret them. It builds directly on FA and leads to Strategic Business Reporting.",
+       "short": "Financial Reporting teaches how to prepare financial statements under International Financial Reporting Standards, for single companies and for groups, and how to interpret them.",
+       "learn": [
+        "Preparing financial statements under IFRS",
+        "Accounting for non-current assets, leases, provisions and financial instruments",
+        "Revenue recognition and other key standards",
+        "Consolidated financial statements for groups",
+        "Interpreting financial statements using ratios"
+       ],
+       "structure": [
+        "Computer-based session exam (March, June, September and December)",
+        "Duration: 3 hours, 100 marks, all questions compulsory",
+        "Section A: 15 objective test questions, 2 marks each (30 marks)",
+        "Section B: three objective test cases worth 10 marks each, five questions per case (30 marks)",
+        "Section C: two constructed response questions worth 20 marks each (40 marks)",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based session exam (March, June, September and December)",
+       "fee": 20000,
+       "scholarship_fee": null,
+       "sort": 2
+      },
+      {
+       "code": "AA",
+       "display_code": "AA",
+       "title": "Audit and Assurance",
+       "about": "Audit and Assurance introduces how audits are planned and carried out and how auditors report. It focuses on understanding risk, gathering evidence and behaving ethically, and prepares you for Advanced Audit and Assurance.",
+       "short": "Audit and Assurance introduces how audits are planned and carried out and how auditors report.",
+       "learn": [
+        "The purpose and regulation of audit and assurance",
+        "Professional ethics and the auditor's responsibilities",
+        "Planning, risk assessment and internal control",
+        "Audit evidence and audit procedures",
+        "Completion, review and audit reports"
+       ],
+       "structure": [
+        "Computer-based session exam (March, June, September and December)",
+        "Duration: 3 hours, 100 marks, all questions compulsory",
+        "Section A: three objective test cases worth 10 marks each (30 marks)",
+        "Section B: three constructed response scenarios, normally one worth 30 marks and two worth 20 marks each (70 marks)",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based session exam (March, June, September and December)",
+       "fee": 20000,
+       "scholarship_fee": null,
+       "sort": 3
+      },
+      {
+       "code": "FM",
+       "display_code": "FM",
+       "title": "Financial Management",
+       "about": "Financial Management teaches how organisations decide what to invest in, how to fund it and how to manage cash and risk. It is the quantitative finance paper of the Applied Skills level and leads to Advanced Financial Management.",
+       "short": "Financial Management teaches how organisations decide what to invest in, how to fund it and how to manage cash and risk.",
+       "learn": [
+        "The role and objectives of financial management",
+        "Investment appraisal techniques",
+        "Sources of business finance and the cost of capital",
+        "Working capital management",
+        "Managing exchange-rate and interest-rate risk",
+        "Basic business valuation"
+       ],
+       "structure": [
+        "Computer-based session exam (March, June, September and December)",
+        "Duration: 3 hours, 100 marks, all questions compulsory",
+        "Section A: 15 objective test questions, 2 marks each (30 marks)",
+        "Section B: three objective test cases worth 10 marks each, five questions per case (30 marks)",
+        "Section C: two constructed response questions worth 20 marks each (40 marks)",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based session exam (March, June, September and December)",
+       "fee": 20000,
+       "scholarship_fee": null,
+       "sort": 4
+      },
+      {
+       "code": "LW",
+       "display_code": "LW",
+       "title": "Corporate and Business Law",
+       "about": "Corporate and Business Law gives accountants the legal knowledge they need to work safely in business. It explains the legal framework businesses operate in, how contracts and employment relationships work, and how companies are formed, run and brought to an end. It is offered in English and Global versions.",
+       "short": "Corporate and Business Law gives accountants the legal knowledge they need to work safely in business.",
+       "learn": [
+        "The legal system and how law is made",
+        "Contract law and the law of agency",
+        "Employment law",
+        "Forming and running companies, including the role of directors and shareholders",
+        "Company capital and insolvency",
+        "Fraud, corruption and professional conduct"
+       ],
+       "structure": [
+        "Computer-based exam, available on demand for the English and Global versions",
+        "Duration: 2 hours, 100 marks, two compulsory sections",
+        "Section A: 45 objective test questions worth 70 marks",
+        "Section B: five multi-task questions worth 6 marks each (30 marks)",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "2 hours",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, available on demand for the English and Global versions",
+       "fee": 20000,
+       "scholarship_fee": null,
+       "sort": 5
+      }
+     ]
+    },
+    {
+     "slug": "professional",
+     "name": "Professional Level (Strategic Professional)",
+     "description": "Two compulsory Essentials papers (SBL and SBR) followed by Options papers. Long scenario-based questions, four sessions a year.",
+     "sort": 2,
+     "courses": [
+      {
+       "code": "SBL",
+       "display_code": "SBL",
+       "title": "Strategic Business Leader",
+       "about": "Strategic Business Leader is the capstone leadership paper. It is a single integrated case study in which you advise as a senior professional on an organisation's strategy, governance, risk, leadership, technology and ethics. Marks are awarded for how you communicate and judge as well as for technical content.",
+       "short": "Strategic Business Leader is the capstone leadership paper.",
+       "learn": [
+        "Leadership, ethics and professional behaviour",
+        "Governance, risk and control",
+        "Strategy: analysing an organisation's position and choosing a course of action",
+        "Organisational change, technology and data",
+        "Using financial and other information to support decisions",
+        "Professional skills: analysis, commercial acumen, communication, evaluation and scepticism"
+       ],
+       "structure": [
+        "Computer-based session exam (March, June, September and December)",
+        "Duration: 3 hours 15 minutes, 100 marks, all questions compulsory",
+        "One integrated case study with three compulsory tasks",
+        "80 marks are for technical content and 20 marks for professional skills",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based session exam (March, June, September and December)",
+       "fee": 25000,
+       "scholarship_fee": null,
+       "sort": 0
+      },
+      {
+       "code": "SBR",
+       "display_code": "SBR",
+       "title": "Strategic Business Reporting",
+       "about": "Strategic Business Reporting takes Financial Reporting to a professional level. You apply IFRS to complex transactions and group structures and explain the reporting effect and the ethical issues to stakeholders, so written explanation matters as much as calculation.",
+       "short": "Strategic Business Reporting takes Financial Reporting to a professional level.",
+       "learn": [
+        "Group financial statements, including complex group structures",
+        "Applying IFRS to complex transactions such as financial instruments, leases and revenue",
+        "Professional judgement and the conceptual framework",
+        "Ethical issues in reporting",
+        "Current developments in reporting, including sustainability"
+       ],
+       "structure": [
+        "Computer-based session exam (March, June, September and December)",
+        "Duration: 3 hours 15 minutes, 100 marks, all questions compulsory",
+        "Section A: two compulsory questions worth 30 and 20 marks (50 marks)",
+        "Section B: two compulsory questions worth 25 marks each (50 marks)",
+        "4 marks are for professional skills",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based session exam (March, June, September and December)",
+       "fee": 25000,
+       "scholarship_fee": null,
+       "sort": 1
+      },
+      {
+       "code": "AFM",
+       "display_code": "AFM",
+       "title": "Advanced Financial Management",
+       "about": "Advanced Financial Management is an applied decision-making paper for students who want a career in corporate finance, treasury or investment. It builds on Financial Management and tests both advanced calculations and the quality of your advice.",
+       "short": "Advanced Financial Management is an applied decision-making paper for students who want a career in corporate finance, treasury or investment.",
+       "learn": [
+        "Advanced investment appraisal",
+        "The economic environment and its effect on financial decisions",
+        "Business valuation, acquisitions and mergers",
+        "Corporate reconstruction",
+        "Treasury and advanced risk management, including hedging currency and interest-rate risk"
+       ],
+       "structure": [
+        "Computer-based session exam (March, June, September and December)",
+        "Duration: 3 hours 15 minutes, 100 marks, all questions compulsory",
+        "Section A: one 50-mark case study",
+        "Section B: two 25-mark questions",
+        "20 marks are for professional skills (10 in Section A and 5 in each Section B question)",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based session exam (March, June, September and December)",
+       "fee": 25000,
+       "scholarship_fee": null,
+       "sort": 2
+      },
+      {
+       "code": "ATX",
+       "display_code": "ATX",
+       "title": "Advanced Taxation",
+       "about": "Advanced Taxation develops Taxation into tax planning and advice for individuals, owner-managed businesses and companies, including groups. Like TX, it is set in country-specific versions. Answers are judged on whether the advice is accurate, practical and clearly communicated.",
+       "short": "Advanced Taxation develops Taxation into tax planning and advice for individuals, owner-managed businesses and companies, including groups.",
+       "learn": [
+        "Tax planning for individuals and business owners",
+        "Taxation of companies and groups",
+        "Tax on transactions such as disposals, reorganisations and share transfers",
+        "International and overseas tax issues",
+        "Ethical and professional issues in giving tax advice"
+       ],
+       "structure": [
+        "Computer-based session exam (March, June, September and December)",
+        "Duration: 3 hours 15 minutes, 100 marks, all questions compulsory",
+        "Section A: one 50-mark case study",
+        "Section B: two 25-mark questions",
+        "20 marks are for professional skills (10 in Section A and 5 in each Section B question)",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based session exam (March, June, September and December)",
+       "fee": 25000,
+       "scholarship_fee": null,
+       "sort": 3
+      },
+      {
+       "code": "AAA",
+       "display_code": "AAA",
+       "title": "Advanced Audit and Assurance",
+       "about": "Advanced Audit and Assurance develops Audit and Assurance into senior-level audit judgement. It assumes strong reporting knowledge from SBR, and ACCA recommends taking SBR first. Answers must be specific to the risk or scenario, not general lists.",
+       "short": "Advanced Audit and Assurance develops Audit and Assurance into senior-level audit judgement.",
+       "learn": [
+        "Planning and risk assessment in more complex audits",
+        "Audit evidence, procedures and completion",
+        "Group audits",
+        "Quality control, ethics and professional scepticism",
+        "Audit reports and other assurance engagements"
+       ],
+       "structure": [
+        "Computer-based session exam (March, June, September and December)",
+        "Duration: 3 hours 15 minutes, 100 marks, all questions compulsory",
+        "Section A: one 50-mark case study",
+        "Section B: two 25-mark questions",
+        "20 marks are for professional skills (10 in Section A and 5 in each Section B question)",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based session exam (March, June, September and December)",
+       "fee": 25000,
+       "scholarship_fee": null,
+       "sort": 4
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "CA",
+   "slug": "ca",
+   "full_name": "Chartered Accountancy \u2014 ICAP Pakistan",
+   "awarding_body": "Institute of Chartered Accountants of Pakistan (ICAP)",
+   "tagline": "Become a Chartered Accountant through ICAP \u2014 PRC, CAF and CFAP coaching under one roof.",
+   "description": "The Chartered Accountant (CA) qualification is awarded by the Institute of Chartered Accountants of Pakistan (ICAP). Students move through a series of exam stages and also complete practical training with an approved firm.",
+   "registration_fee": 15000,
+   "registration_fee_scholarship": 10000,
+   "registration_no_label": "ICAP Registration / CRN Number",
+   "overview": [
+    {
+     "title": "How the CA qualification works",
+     "paragraphs": [
+      "The Chartered Accountant (CA) qualification is awarded by the Institute of Chartered Accountants of Pakistan (ICAP). Students move through a series of exam stages and also complete practical training with an approved firm."
+     ],
+     "bullets": [
+      "Qualifying Assessment Test (QAT): only for students with HSSC or A-Level results of 50% to 59%",
+      "Pre-Requisite Competencies (PRC): three papers",
+      "Certificate in Accounting and Finance (CAF): eight papers in two groups",
+      "Certified Finance and Accounting Professional (CFAP): six papers",
+      "Strategic Case Study: a final integrated paper taken after CFAP",
+      "Practical training, hands-on courses and integrated modules alongside or after the exams"
+     ]
+    },
+    {
+     "title": "QAT and Pre-Requisite Competencies (PRC)",
+     "paragraphs": [
+      "PRC assesses the basic accounting, quantitative and business knowledge that the CAF stage builds on. Students can self-study or take classes with an ICAP-registered tutor. There is also a separate English Communication Skills course, assessed by the British Council."
+     ],
+     "bullets": []
+    },
+    {
+     "title": "Certificate in Accounting and Finance (CAF)",
+     "paragraphs": [
+      "CAF is the core professional stage. Its papers focus on applying technical knowledge and analysing business problems. The eight papers are split into two groups. Students can sit Group B papers after passing two Group A papers, and can sit up to four papers in one sitting."
+     ],
+     "bullets": []
+    },
+    {
+     "title": "Certified Finance and Accounting Professional (CFAP)",
+     "paragraphs": [
+      "CFAP is the final professional stage of the exams. It focuses on innovation and decision-making, using technical knowledge and analytical skills. Students must have passed or been exempted from all CAF papers, and must meet the training conditions, before sitting CFAP. Unless only one paper remains, students sit at least two papers in a sitting."
+     ],
+     "bullets": []
+    },
+    {
+     "title": "Where students start",
+     "table": [
+      [
+       "HSSC or A-Level, 60% or above",
+       "Register for PRC. QAT is not required."
+      ],
+      [
+       "HSSC or A-Level, 50% to 59%",
+       "Pass the QAT first, then register for PRC within 12 months."
+      ],
+      [
+       "Associate degree (minimum 45%)",
+       "Exempt from QAT. PRC exemption depends on whether the degree is in a relevant subject area."
+      ],
+      [
+       "16-year graduates",
+       "Exemptions from PRC and some CAF papers, or the Graduate Conversion Course in place of CAF, depending on the university and degree."
+      ],
+      [
+       "Finalists of ACCA, CIMA, PIPFA or ICMAP",
+       "Exempt from PRC and specified CAF papers."
+      ]
+     ],
+     "paragraphs": [
+      "Exemption rules have detailed conditions, so students should always check ICAP's current rules."
+     ]
+    },
+    {
+     "title": "Strategic Case Study",
+     "paragraphs": [
+      "The Strategic Case Study is the final paper. It tests integrated knowledge through one case study, and students receive pre-seen material 20 to 30 days before the exam. The paper is open book. It is offered twice a year (Summer and Winter), and students can sit it once they have passed all CFAP papers or have one paper remaining. It replaces MSA-2 Management Professional Competence."
+     ]
+    },
+    {
+     "title": "Hands-on courses and integrated modules",
+     "bullets": [
+      "Before training or CFAP: Presentation and Personal Effectiveness (PPE) and MS Office for Business",
+      "Before CFAP-6 (recommended) and the Strategic Case Study (required): AI and Data Analytics",
+      "Before the Strategic Case Study: Governance and Ethics"
+     ]
+    }
+   ],
+   "levels": [
+    {
+     "slug": "qat",
+     "name": "Qualifying Assessment Test (QAT)",
+     "description": "Only for students with HSSC or A-Level results of 50% to 59%.",
+     "sort": 0,
+     "courses": [
+      {
+       "code": "QAT",
+       "display_code": "QAT",
+       "title": "Qualifying Assessment Test",
+       "about": "The Qualifying Assessment Test checks basic English, mathematics and analytical reasoning. It is for students who finished HSSC or A-Levels with 50% to 59%. Students with 60% or more do not need it. Passing QAT lets you register for the Pre-Requisite Competencies (PRC) stage.",
+       "short": "The Qualifying Assessment Test checks basic English, mathematics and analytical reasoning.",
+       "learn": [
+        "English language skills",
+        "Mathematics",
+        "Analytical reasoning"
+       ],
+       "structure": [
+        "Computer-based test",
+        "Offered in March, June, September, November and December",
+        "Maximum of three attempts",
+        "After passing, you must register for PRC within 12 months, or retake the QAT",
+        "A model paper is available on ICAP's website"
+       ],
+       "exam_duration": null,
+       "pass_mark": null,
+       "exam_format": "Computer-based test",
+       "fee": null,
+       "scholarship_fee": null,
+       "sort": 0
+      }
+     ]
+    },
+    {
+     "slug": "prc",
+     "name": "Pre-Requisite Competencies (PRC)",
+     "description": "Three papers covering the basic accounting, quantitative and business knowledge that CAF builds on.",
+     "sort": 1,
+     "courses": [
+      {
+       "code": "PRC-01",
+       "display_code": "PRC-01",
+       "title": "Fundamentals of Accounting",
+       "about": "PRC-01 is the first accounting paper of the CA route and assumes no prior accounting knowledge. It teaches how transactions are recorded and how basic financial statements are produced, and it prepares you for Financial Accounting and Reporting at the CAF stage.",
+       "short": "PRC-01 is the first accounting paper of the CA route and assumes no prior accounting knowledge.",
+       "learn": [
+        "The accounting equation and double-entry bookkeeping",
+        "Recording transactions in books and ledgers",
+        "The trial balance and period-end adjustments",
+        "Preparing basic financial statements"
+       ],
+       "structure": [
+        "Assessments are offered every two months (January, March, May, July, September and November)",
+        "All three PRC assessments must be cleared within 15 months of your first attempt",
+        "Approved calculators are allowed"
+       ],
+       "exam_duration": null,
+       "pass_mark": null,
+       "exam_format": "Assessments are offered every two months (January, March, May, July, September and November)",
+       "fee": 15000,
+       "scholarship_fee": 10000,
+       "sort": 0
+      },
+      {
+       "code": "PRC-02",
+       "display_code": "PRC-02",
+       "title": "Quantitative Analysis for Business",
+       "about": "PRC-02 covers the mathematics and statistics that accountants and business professionals use every day. It builds the numerical confidence needed for costing, finance and analysis at later stages.",
+       "short": "PRC-02 covers the mathematics and statistics that accountants and business professionals use every day.",
+       "learn": [
+        "Mathematics used in business, such as percentages, ratios and financial mathematics",
+        "Presenting and summarising data",
+        "Statistics and probability",
+        "Using quantitative techniques to support business decisions"
+       ],
+       "structure": [
+        "Assessments are offered every two months (January, March, May, July, September and November)",
+        "All three PRC assessments must be cleared within 15 months of your first attempt",
+        "Approved calculators are allowed"
+       ],
+       "exam_duration": null,
+       "pass_mark": null,
+       "exam_format": "Assessments are offered every two months (January, March, May, July, September and November)",
+       "fee": 15000,
+       "scholarship_fee": 10000,
+       "sort": 1
+      },
+      {
+       "code": "PRC-03",
+       "display_code": "PRC-03",
+       "title": "Business and Economic Insights",
+       "about": "PRC-03 introduces how businesses are organised and how they operate within the wider economy. It combines business studies with the principles of economics and gives context for the strategy, law and analysis papers that follow.",
+       "short": "PRC-03 introduces how businesses are organised and how they operate within the wider economy.",
+       "learn": [
+        "How businesses are organised and managed",
+        "The business environment",
+        "Principles of economics, including markets, demand and supply",
+        "Basic macroeconomic ideas such as growth, inflation and trade"
+       ],
+       "structure": [
+        "One paper of 120 minutes carrying 100 marks",
+        "Business and economics are assessed together in a single paper",
+        "Pass mark: 50%",
+        "Assessments are offered every two months (January, March, May, July, September and November)",
+        "All three PRC assessments must be cleared within 15 months of your first attempt",
+        "Approved calculators are allowed"
+       ],
+       "exam_duration": "120 minutes",
+       "pass_mark": "50%",
+       "exam_format": "One paper of 120 minutes carrying 100 marks",
+       "fee": 15000,
+       "scholarship_fee": 10000,
+       "sort": 2
+      }
+     ]
+    },
+    {
+     "slug": "hoc",
+     "name": "Mandatory Hands-on Courses (HOC)",
+     "description": "Practical courses required alongside the exams.",
+     "sort": 2,
+     "courses": [
+      {
+       "code": "PPE",
+       "display_code": "PPE",
+       "title": "Presentation and Personal Effectiveness",
+       "about": "PPE is a mandatory hands-on course in the CA route. ICAP requires it to be completed before practical training or the CFAP stage. It is part of the Mandatory Hands-on Courses (HOC) offered at Leads College of Accountancy.",
+       "short": "PPE is a mandatory hands-on course in the CA route.",
+       "learn": [],
+       "structure": [],
+       "exam_duration": null,
+       "pass_mark": null,
+       "exam_format": null,
+       "fee": 15000,
+       "scholarship_fee": 10000,
+       "sort": 0
+      },
+      {
+       "code": "MSO",
+       "display_code": "MSO",
+       "title": "MS Office",
+       "about": "MS Office for Business is a mandatory hands-on course in the CA route. ICAP requires it to be completed before practical training or the CFAP stage. It is part of the Mandatory Hands-on Courses (HOC) offered at Leads College of Accountancy.",
+       "short": "MS Office for Business is a mandatory hands-on course in the CA route.",
+       "learn": [],
+       "structure": [],
+       "exam_duration": null,
+       "pass_mark": null,
+       "exam_format": null,
+       "fee": 15000,
+       "scholarship_fee": 10000,
+       "sort": 1
+      },
+      {
+       "code": "ECS",
+       "display_code": "ECS",
+       "title": "English Communication Skills",
+       "about": "English Communication Skills is a separate course in the CA route, assessed by the British Council. It is part of the Mandatory Hands-on Courses (HOC) offered at Leads College of Accountancy.",
+       "short": "English Communication Skills is a separate course in the CA route, assessed by the British Council.",
+       "learn": [],
+       "structure": [],
+       "exam_duration": null,
+       "pass_mark": null,
+       "exam_format": null,
+       "fee": 15000,
+       "scholarship_fee": 10000,
+       "sort": 2
+      }
+     ]
+    },
+    {
+     "slug": "caf-a",
+     "name": "CAF Group A",
+     "description": "Core professional stage \u2014 Group A papers. Students can sit Group B after passing two Group A papers.",
+     "sort": 3,
+     "courses": [
+      {
+       "code": "CAF-1",
+       "display_code": "CAF-1",
+       "title": "Financial Accounting and Reporting",
+       "about": "CAF-1 is the core financial reporting paper of the CAF stage. It teaches you to apply International Financial Reporting Standards to real business transactions and to prepare financial statements. Questions mix short multiple-choice items with calculations, journal entries and written explanations.",
+       "short": "CAF-1 is the core financial reporting paper of the CAF stage.",
+       "learn": [
+        "The Conceptual Framework for financial reporting",
+        "Property, plant and equipment, investment property and intangible assets",
+        "Impairment, borrowing costs and government grants",
+        "Statements of cash flows and changes in equity",
+        "Preparing statements of profit or loss and financial position",
+        "Accounting for not-for-profit organisations"
+       ],
+       "structure": [
+        "Written exam, 100 marks",
+        "Duration: 3 hours 15 minutes, including 15 minutes of reading time",
+        "Offered twice a year (Spring and Autumn)",
+        "All questions are compulsory",
+        "In the Spring 2026 paper there were nine questions in two sections",
+        "Section A: ten one-mark multiple-choice questions plus five written or calculation questions (50 marks)",
+        "Section B: three questions worth 15, 20 and 15 marks (50 marks)",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Written exam, 100 marks",
+       "fee": 15000,
+       "scholarship_fee": 10000,
+       "sort": 0
+      },
+      {
+       "code": "CAF-2",
+       "display_code": "CAF-2",
+       "title": "Taxation Principles and Compliance",
+       "about": "CAF-2 teaches how Pakistan's income tax and sales tax laws work in practice. You learn to compute tax liabilities for individuals, partnerships and companies, and to advise on filing, assessment and compliance.",
+       "short": "CAF-2 teaches how Pakistan's income tax and sales tax laws work in practice.",
+       "learn": [
+        "Income Tax Ordinance, 2001: salary, business and other income, deductions and depreciation",
+        "Capital gains and the tax treatment of different taxpayers, including associations of persons and companies",
+        "Sales tax under the Sales Tax Act, 1990",
+        "Returns, assessments, appeals and recovery",
+        "Tax avoidance and tax evasion"
+       ],
+       "structure": [
+        "Written exam, 100 marks",
+        "Duration: 3 hours 15 minutes, including 15 minutes of reading time",
+        "Offered twice a year (Spring and Autumn)",
+        "All questions are compulsory",
+        "In the Spring 2026 paper there were eight questions in two sections",
+        "Section A: six questions, including a multiple-choice question (66 marks)",
+        "Section B: two questions worth 17 marks each (34 marks)",
+        "Tax rates were provided on the last page of the paper",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Written exam, 100 marks",
+       "fee": 15000,
+       "scholarship_fee": 10000,
+       "sort": 1
+      },
+      {
+       "code": "CAF-3",
+       "display_code": "CAF-3",
+       "title": "Data, Systems and Risks",
+       "about": "CAF-3 is a new paper in the current scheme. It recognises how much modern accounting depends on technology and risk management. It covers how organisations use data and information systems, the risks those systems create, and how the risks are managed.",
+       "short": "CAF-3 is a new paper in the current scheme.",
+       "learn": [
+        "Data and information in business",
+        "Business information systems and technology",
+        "Information security and system controls",
+        "Identifying, assessing and managing risk",
+        "The effect of technology on accounting and decision-making"
+       ],
+       "structure": [
+        "Written exam, 100 marks",
+        "Duration: 3 hours 15 minutes, including 15 minutes of reading time",
+        "Offered twice a year (Spring and Autumn)",
+        "All questions are compulsory",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Written exam, 100 marks",
+       "fee": 15000,
+       "scholarship_fee": 10000,
+       "sort": 2
+      },
+      {
+       "code": "CAF-4",
+       "display_code": "CAF-4",
+       "title": "Business Law Dynamics",
+       "about": "CAF-4 gives accountants the legal knowledge they need to work in business. It combines the former Business Law and Company Law papers into one paper, so you study commercial law and company law together.",
+       "short": "CAF-4 gives accountants the legal knowledge they need to work in business.",
+       "learn": [
+        "The legal framework for business",
+        "Contract and commercial law",
+        "Company law, including formation, shares, directors and meetings",
+        "The legal responsibilities of directors and professionals"
+       ],
+       "structure": [
+        "Written exam, 100 marks",
+        "Duration: 3 hours 15 minutes, including 15 minutes of reading time",
+        "Offered twice a year (Spring and Autumn)",
+        "All questions are compulsory",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Written exam, 100 marks",
+       "fee": 15000,
+       "scholarship_fee": 10000,
+       "sort": 3
+      }
+     ]
+    },
+    {
+     "slug": "caf-b",
+     "name": "CAF Group B",
+     "description": "Core professional stage \u2014 Group B papers.",
+     "sort": 4,
+     "courses": [
+      {
+       "code": "CAF-5",
+       "display_code": "CAF-5",
+       "title": "Management Accounting",
+       "about": "CAF-5 teaches how managers use cost and performance information to plan, control and make decisions. It was formerly called Cost and Management Accounting and is the first paper of Group B.",
+       "short": "CAF-5 teaches how managers use cost and performance information to plan, control and make decisions.",
+       "learn": [
+        "Cost classification and costing methods",
+        "Budgeting and budgetary control",
+        "Standard costing and variance analysis",
+        "Short-term decision-making",
+        "Performance measurement"
+       ],
+       "structure": [
+        "Written exam, 100 marks",
+        "Duration: 3 hours 15 minutes, including 15 minutes of reading time",
+        "Offered twice a year (Spring and Autumn)",
+        "All questions are compulsory",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Written exam, 100 marks",
+       "fee": null,
+       "scholarship_fee": null,
+       "sort": 0
+      },
+      {
+       "code": "CAF-6",
+       "display_code": "CAF-6",
+       "title": "Corporate Reporting",
+       "about": "CAF-6 takes financial reporting to the next level. It deals with more complex reporting issues and with the financial statements of groups of companies, and it builds on CAF-1. It replaces the former Financial Accounting and Reporting-II paper.",
+       "short": "CAF-6 takes financial reporting to the next level.",
+       "learn": [
+        "Advanced IFRS requirements for complex transactions",
+        "Group financial statements",
+        "Judgement in applying accounting standards",
+        "Preparing and presenting reported results"
+       ],
+       "structure": [
+        "Written exam, 100 marks",
+        "Duration: 3 hours 15 minutes, including 15 minutes of reading time",
+        "Offered twice a year (Spring and Autumn)",
+        "All questions are compulsory",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Written exam, 100 marks",
+       "fee": null,
+       "scholarship_fee": null,
+       "sort": 1
+      },
+      {
+       "code": "CAF-7",
+       "display_code": "CAF-7",
+       "title": "Business Insights and Analysis",
+       "about": "CAF-7 teaches you to analyse a business as a whole. You use financial and non-financial information to assess performance, understand strategy and support decisions. It replaces the former Managerial and Financial Analysis paper.",
+       "short": "CAF-7 teaches you to analyse a business as a whole.",
+       "learn": [
+        "The business environment and strategy",
+        "Analysing financial statements and performance",
+        "Financial and non-financial performance measures",
+        "Decision-making and business analysis"
+       ],
+       "structure": [
+        "Written exam, 100 marks",
+        "Duration: 3 hours 15 minutes, including 15 minutes of reading time",
+        "Offered twice a year (Spring and Autumn)",
+        "All questions are compulsory",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Written exam, 100 marks",
+       "fee": null,
+       "scholarship_fee": null,
+       "sort": 2
+      },
+      {
+       "code": "CAF-8",
+       "display_code": "CAF-8",
+       "title": "Audit and Assurance Essentials",
+       "about": "CAF-8 introduces how audits are planned and carried out and how auditors report. It is the main audit paper of the CAF stage and builds the knowledge you need for Audit, Assurance and Data at CFAP.",
+       "short": "CAF-8 introduces how audits are planned and carried out and how auditors report.",
+       "learn": [
+        "The purpose and framework of audit and assurance",
+        "Professional ethics and the auditor's responsibilities",
+        "Audit planning, risk assessment and internal control",
+        "Audit evidence and procedures",
+        "Completion and reporting"
+       ],
+       "structure": [
+        "Written exam, 100 marks",
+        "Duration: 3 hours 15 minutes, including 15 minutes of reading time",
+        "Offered twice a year (Spring and Autumn)",
+        "All questions are compulsory",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 15 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Written exam, 100 marks",
+       "fee": null,
+       "scholarship_fee": null,
+       "sort": 3
+      }
+     ]
+    },
+    {
+     "slug": "cfap",
+     "name": "CFAP",
+     "description": "Certified Finance and Accounting Professional \u2014 the final professional stage of the exams.",
+     "sort": 5,
+     "courses": [
+      {
+       "code": "CFAP-1",
+       "display_code": "CFAP-1",
+       "title": "Advanced Corporate Reporting",
+       "about": "CFAP-1 develops financial reporting to an advanced professional level. You work with complex transactions and group structures and explain your judgements clearly. It replaces Advanced Accounting and Financial Reporting.",
+       "short": "CFAP-1 develops financial reporting to an advanced professional level.",
+       "learn": [
+        "Complex group financial statements",
+        "Advanced application of IFRS",
+        "Judgement and estimation in reporting",
+        "Communicating reporting decisions to stakeholders"
+       ],
+       "structure": [
+        "Computer-based exam, 100 marks",
+        "Duration: 3 hours 30 minutes, including 15 minutes of reading time and an extra 15 minutes allowed for computer-based delivery",
+        "Offered four times a year (Spring, Summer, Autumn and Winter) from Summer 2026",
+        "Some papers are open book, and ICAP publishes the permitted books for each paper",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 30 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, 100 marks",
+       "fee": null,
+       "scholarship_fee": null,
+       "sort": 0
+      },
+      {
+       "code": "CFAP-2",
+       "display_code": "CFAP-2",
+       "title": "Corporate Laws and Governance",
+       "about": "CFAP-2 covers the corporate laws that apply to companies in Pakistan and the principles of good governance. It is aimed at the advisory and board-level issues a chartered accountant meets in practice.",
+       "short": "CFAP-2 covers the corporate laws that apply to companies in Pakistan and the principles of good governance.",
+       "learn": [
+        "Advanced corporate law",
+        "Corporate governance and board responsibilities",
+        "Compliance obligations of companies and their directors",
+        "Ethical and legal risks in corporate decision-making"
+       ],
+       "structure": [
+        "Computer-based exam, 100 marks",
+        "Duration: 3 hours 30 minutes, including 15 minutes of reading time and an extra 15 minutes allowed for computer-based delivery",
+        "Offered four times a year (Spring, Summer, Autumn and Winter) from Summer 2026",
+        "Some papers are open book, and ICAP publishes the permitted books for each paper",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 30 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, 100 marks",
+       "fee": null,
+       "scholarship_fee": null,
+       "sort": 1
+      },
+      {
+       "code": "CFAP-3",
+       "display_code": "CFAP-3",
+       "title": "Sustainability Reporting and Assurance",
+       "about": "CFAP-3 is a new paper. It reflects the growing demand for reliable sustainability information. It covers how organisations report on sustainability matters and how that information is assured. It replaces the former Strategy and Performance Measurement paper.",
+       "short": "CFAP-3 is a new paper.",
+       "learn": [
+        "Sustainability reporting frameworks and disclosures",
+        "Environmental, social and governance reporting",
+        "Assurance over sustainability information",
+        "The role of the accountant in sustainable business"
+       ],
+       "structure": [
+        "Computer-based exam, 100 marks",
+        "Duration: 3 hours 30 minutes, including 15 minutes of reading time and an extra 15 minutes allowed for computer-based delivery",
+        "Offered four times a year (Spring, Summer, Autumn and Winter) from Summer 2026",
+        "Some papers are open book, and ICAP publishes the permitted books for each paper",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 30 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, 100 marks",
+       "fee": null,
+       "scholarship_fee": null,
+       "sort": 2
+      },
+      {
+       "code": "CFAP-4",
+       "display_code": "CFAP-4",
+       "title": "Strategic Business Finance",
+       "about": "CFAP-4 is the advanced finance paper. You apply valuation, financing and risk techniques to strategic decisions. It replaces Business Finance Decisions.",
+       "short": "CFAP-4 is the advanced finance paper.",
+       "learn": [
+        "Investment and financing decisions",
+        "Business and share valuation",
+        "Capital structure and funding",
+        "Managing financial risk"
+       ],
+       "structure": [
+        "Computer-based exam, 100 marks",
+        "Duration: 3 hours 30 minutes, including 15 minutes of reading time and an extra 15 minutes allowed for computer-based delivery",
+        "Offered four times a year (Spring, Summer, Autumn and Winter) from Summer 2026",
+        "Some papers are open book, and ICAP publishes the permitted books for each paper",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 30 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, 100 marks",
+       "fee": null,
+       "scholarship_fee": null,
+       "sort": 3
+      },
+      {
+       "code": "CFAP-5",
+       "display_code": "CFAP-5",
+       "title": "Taxation Practice and Planning",
+       "about": "CFAP-5 develops tax knowledge into practical planning and advice. You advise individuals and businesses on structuring their affairs within Pakistan's tax laws. It replaces Tax Planning and Practices.",
+       "short": "CFAP-5 develops tax knowledge into practical planning and advice.",
+       "learn": [
+        "Advanced income tax and sales tax issues",
+        "Tax planning for individuals, businesses and companies",
+        "Advising clients on tax compliance and risk",
+        "Professional and ethical issues in tax advice"
+       ],
+       "structure": [
+        "Computer-based exam, 100 marks",
+        "Duration: 3 hours 30 minutes, including 15 minutes of reading time and an extra 15 minutes allowed for computer-based delivery",
+        "Offered four times a year (Spring, Summer, Autumn and Winter) from Summer 2026",
+        "Some papers are open book, and ICAP publishes the permitted books for each paper",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 30 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, 100 marks",
+       "fee": null,
+       "scholarship_fee": null,
+       "sort": 4
+      },
+      {
+       "code": "CFAP-6",
+       "display_code": "CFAP-6",
+       "title": "Audit, Assurance and Data",
+       "about": "CFAP-6 develops audit knowledge to a senior level and adds data. It covers complex audit and assurance engagements and how auditors use data and technology. Students are required to pass the AI and Data Analytics module before sitting it. It replaces Audit, Assurance and Related Services.",
+       "short": "CFAP-6 develops audit knowledge to a senior level and adds data.",
+       "learn": [
+        "Advanced audit planning and risk assessment",
+        "Complex audit and assurance engagements",
+        "Using data and data analytics in audit",
+        "Professional ethics, quality and reporting"
+       ],
+       "structure": [
+        "Computer-based exam, 100 marks",
+        "Duration: 3 hours 30 minutes, including 15 minutes of reading time and an extra 15 minutes allowed for computer-based delivery",
+        "Offered four times a year (Spring, Summer, Autumn and Winter) from Summer 2026",
+        "Some papers are open book, and ICAP publishes the permitted books for each paper",
+        "Pass mark: 50%"
+       ],
+       "exam_duration": "3 hours 30 minutes",
+       "pass_mark": "50%",
+       "exam_format": "Computer-based exam, 100 marks",
+       "fee": null,
+       "scholarship_fee": null,
+       "sort": 5
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
