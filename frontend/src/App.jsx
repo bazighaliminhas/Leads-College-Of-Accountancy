@@ -40,8 +40,7 @@ function Tracker() {
 function AdminShell(props) {
   const { user } = useApp();
   const [opts, setOpts] = useState({});
-  const loc = useLocation();
-  useEffect(() => { if (user?.role === "admin") api.get("/admin/options").then((r) => setOpts(r.data)).catch(() => {}); }, [user, loc.pathname]);
+  useEffect(() => { if (user?.role === "admin") api.get("/admin/options").then((r) => setOpts(r.data)).catch(() => {}); }, [user?.id]);
   return <OptionsCtx.Provider value={opts}><PortalLayout {...props} /></OptionsCtx.Provider>;
 }
 

@@ -6,8 +6,12 @@ export const useApp = () => useContext(Ctx);
 
 const emptyCart = { items: [], registration: [], subtotal: 0, registration_fee: 0, total: 0, count: 0 };
 
+const cachedSite = (() => {
+  try { return JSON.parse(localStorage.getItem("lca_site")); } catch { return null; }
+})();
+
 export function AppProvider({ children }) {
-  const [site, setSite] = useState(null);
+  const [site, setSite] = useState(cachedSite);
   const [user, setUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
   const [unread, setUnread] = useState(0);
@@ -39,7 +43,10 @@ export function AppProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    api.get("/site").then((r) => setSite(r.data)).catch(() => setSite({ settings: {}, programs: [], payment_accounts: [] }));
+    api.get("/site").then((r) => {
+      setSite(r.data);
+      try { localStorage.setItem("lca_site", JSON.stringify(r.data)); } catch {}
+    }).catch(() => setSite((prev) => prev || { settings: {}, programs: [], payment_accounts: [] }));
     refreshMe().then(refreshCart);
     const onOut = () => { setUser(null); refreshCart(); };
     window.addEventListener("lca:logout", onOut);

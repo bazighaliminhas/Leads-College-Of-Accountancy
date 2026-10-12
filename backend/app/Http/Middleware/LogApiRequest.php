@@ -13,7 +13,7 @@ class LogApiRequest
     public function handle(Request $request, Closure $next)
     {
         $response = $next($request);
-        if ($request->is('api/track')) return $response; // page views are logged by the track endpoint itself
+        if ($request->isMethod('get') || $request->is('api/track')) return $response;
         try {
             ActivityLog::create([
                 'user_id' => auth('sanctum')->id(),

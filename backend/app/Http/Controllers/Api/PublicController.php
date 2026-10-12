@@ -13,6 +13,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Support\Activity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class PublicController extends Controller
 {
@@ -24,21 +25,41 @@ class PublicController extends Controller
 
     public function site()
     {
-        return response()->json([
-            'settings' => Setting::allPublic(),
-            'programs' => Program::where('status', 'active')->orderBy('sort_order')
-                ->with(['levels' => fn ($q) => $q->withCount(['courses' => fn ($c) => $c->where('status', 'published')]), 'examSessions' => fn ($q) => $q->where('status', 'open')])->get(),
-            'payment_accounts' => PaymentAccount::where('is_active', true)->orderBy('sort_order')->get(),
-        ]);
+        $data = Cache::remember('lca_public_site', 300, function () {
+            return [
+                'settings' => Setting::allPublic(),
+                'programs' => Program::where('status', 'active')->orderBy('sort_order')
+                    ->with(['levels' => fn ($q) => $q->withCount(['courses' => fn ($c) => $c->where('status', 'published')]), 'examSessions' => fn ($q) => $q->where('status', 'open')])->get(),
+                'payment_accounts' => PaymentAccount::where('is_active', true)->orderBy('sort_order')->get(),
+            ];
+        });
+        return response()->json($data);
     }
 
     public function courses(Request $request)
     {
+        $program = $request->program;
+        $level = $request->level;
+        $featured = $request->featured;
+        $search = $request->search;
+
+        if (!$search) {
+            $cacheKey = 'lca_courses_'.($program ?? 'all').'_'.($level ?? 'all').'_'.($featured ? '1' : '0');
+            $data = Cache::remember($cacheKey, 180, function () use ($program, $level, $featured) {
+                $q = $this->courseCard(Course::query());
+                if ($program) $q->whereHas('program', fn ($p) => $p->where('slug', $program));
+                if ($level) $q->whereHas('level', fn ($p) => $p->where('slug', $level));
+                if ($featured) $q->where('is_featured', true);
+                return $q->get()->makeHidden(['about', 'learn', 'structure']);
+            });
+            return response()->json($data);
+        }
+
         $q = $this->courseCard(Course::query());
-        if ($request->program) $q->whereHas('program', fn ($p) => $p->where('slug', $request->program));
-        if ($request->level) $q->whereHas('level', fn ($p) => $p->where('slug', $request->level));
-        if ($request->featured) $q->where('is_featured', true);
-        if ($s = $request->search) $q->where(fn ($w) => $w->where('title', 'like', "%$s%")->orWhere('code', 'like', "%$s%"));
+        if ($program) $q->whereHas('program', fn ($p) => $p->where('slug', $program));
+        if ($level) $q->whereHas('level', fn ($p) => $p->where('slug', $level));
+        if ($featured) $q->where('is_featured', true);
+        $q->where(fn ($w) => $w->where('title', 'like', "%$search%")->orWhere('code', 'like', "%$search%"));
         return response()->json($q->get()->makeHidden(['about', 'learn', 'structure']));
     }
 

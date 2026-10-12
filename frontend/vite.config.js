@@ -7,11 +7,24 @@ export default defineConfig({
   plugins: [react()],
   base: process.env.NODE_ENV === "production" ? "/app/" : "/",
   server: {
+    host: "127.0.0.1",
     port: 5173,
     proxy: {
-      "/api": "http://127.0.0.1:8000",
-      "/files": "http://127.0.0.1:8000",
-      "/storage": "http://127.0.0.1:8000",
+      "/api": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+        headers: { Connection: "close" },
+      },
+      "/files": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+        headers: { Connection: "close" },
+      },
+      "/storage": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+        headers: { Connection: "close" },
+      },
     },
   },
   build: { outDir: "../backend/public/app", emptyOutDir: true },

@@ -29,6 +29,7 @@ export default function Home() {
   const [slide, setSlide] = useState(0);
   const catRef = useRef(null);
   const railRef = useRef(null);
+  const courseCache = useRef({});
 
   useEffect(() => { const t = setInterval(() => setSlide((x) => (x + 1) % slides.length), 7000); return () => clearInterval(t); }, []);
   useEffect(() => {
@@ -40,13 +41,21 @@ export default function Home() {
       .catch(() => setFeatured([]));
   }, []);
   useEffect(() => {
-    setCourses(null);
+    const key = `${program}_${level}`;
+    if (courseCache.current[key]) {
+      setCourses(courseCache.current[key]);
+    } else {
+      setCourses(null);
+    }
     api.get("/courses", { params: { program, level: level || undefined } })
       .then((r) => {
         const list = Array.isArray(r.data) ? r.data : (Array.isArray(r.data?.data) ? r.data.data : []);
+        courseCache.current[key] = list;
         setCourses(list);
       })
-      .catch(() => setCourses([]));
+      .catch(() => {
+        if (!courseCache.current[key]) setCourses([]);
+      });
   }, [program, level]);
   useEffect(() => {
     if (loc.hash === "#courses" && catRef.current) setTimeout(() => catRef.current.scrollIntoView({ behavior: "smooth" }), 80);
