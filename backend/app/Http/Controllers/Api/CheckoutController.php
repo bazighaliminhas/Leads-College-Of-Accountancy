@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\UserNotification;
 use App\Support\Activity;
 use App\Support\Pricing;
+use App\Support\Notify;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -47,7 +48,7 @@ class CheckoutController extends Controller
 
         $order = DB::transaction(function () use ($data, $user, $cart, $quote, $request) {
             $order = Order::create([
-                'order_no' => 'LCA-'.now()->format('ymd').'-'.str_pad((string) (Order::count() + 1), 4, '0', STR_PAD_LEFT),
+                'order_no' => 'TMP-'.\Illuminate\Support\Str::uuid(),
                 'user_id' => $user->id,
                 'cart_id' => $cart->id,
                 'subtotal' => $quote['subtotal'],
@@ -58,6 +59,7 @@ class CheckoutController extends Controller
                 'ip' => $request->ip(),
                 'user_agent' => mb_substr((string) $request->userAgent(), 0, 500),
             ] + collect($data)->except('agree')->all());
+            $order->update(['order_no' => 'LCA-'.now()->format('ymd').'-'.str_pad((string) $order->id, 5, '0', STR_PAD_LEFT)]);
             foreach ($quote['items'] as $l) {
                 $order->items()->create(['course_id' => $l['course_id'], 'exam_session_id' => $l['exam_session_id'], 'item_type' => 'course', 'code' => $l['code'], 'title' => $l['title'], 'session_name' => $l['session'], 'price' => $l['price']]);
                 Enrollment::updateOrCreate(['user_id' => $user->id, 'course_id' => $l['course_id']], ['order_id' => $order->id, 'exam_session_id' => $l['exam_session_id'], 'status' => 'pending', 'granted_by' => null, 'granted_at' => null]);
@@ -73,7 +75,7 @@ class CheckoutController extends Controller
         });
 
         Activity::log('order.placed', "Order {$order->order_no} placed (PKR {$order->total})", $order, $data);
-        $this->notifyAdmins('New admission order', "{$order->order_no} by {$order->first_name} {$order->last_name} — PKR ".number_format($order->total), '/admin/orders');
+        Notify::orderPlaced($order);
         return response()->json(['order' => $order->load('items')], 201);
     }
 
@@ -107,8 +109,7 @@ class CheckoutController extends Controller
         $order->update(['status' => 'payment_submitted'] + ($request->filled('registration_no') ? ['registration_no' => $data['registration_no']] : []));
         if ($request->filled('registration_no')) $request->user()->update(['registration_no' => $data['registration_no']]);
         Activity::log('payment.submitted', "Payment proof for {$order->order_no}: {$data['method']} ref {$data['transaction_ref']} PKR {$data['amount']}", $payment, $data);
-        UserNotification::create(['user_id' => $order->user_id, 'type' => 'info', 'title' => 'Payment proof received', 'body' => "We received your payment proof for {$order->order_no}. The admin will verify it and grant course access.", 'link' => '/student/orders']);
-        $this->notifyAdmins('Payment proof submitted', "{$order->order_no}: PKR ".number_format($data['amount'])." via {$data['method']} (ref {$data['transaction_ref']})", '/admin/orders');
+        Notify::paymentSubmitted($order, $payment);
         return response()->json(['order' => $order->fresh(['items', 'payments']), 'payment' => $payment], 201);
     }
 
@@ -122,8 +123,4 @@ class CheckoutController extends Controller
         return response()->json(['order' => $order]);
     }
 
-    protected function notifyAdmins(string $title, string $body, string $link): void
-    {
-        User::where('role', 'admin')->pluck('id')->each(fn ($id) => UserNotification::create(['user_id' => $id, 'type' => 'admin', 'title' => $title, 'body' => $body, 'link' => $link]));
-    }
 }

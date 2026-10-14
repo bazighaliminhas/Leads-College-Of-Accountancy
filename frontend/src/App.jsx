@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Routes, Route, Outlet, useLocation } from "react-router-dom";
-import { LayoutDashboard, BookOpen, Receipt, Bell, Megaphone, UserRound, Users, GraduationCap, ShieldCheck, KeyRound, PlayCircle, Layers, CalendarDays, Wallet, Landmark, MessageSquare, PhoneCall, Mail, ShoppingCart, Activity, Settings, ListChecks, FileText, Library } from "lucide-react";
+import { LayoutDashboard, BookOpen, Receipt, Bell, Megaphone, UserRound, Users, GraduationCap, ShieldCheck, KeyRound, PlayCircle, Layers, CalendarDays, Wallet, Landmark, MessageSquare, PhoneCall, Mail, ShoppingCart, Activity, Settings, ListChecks, FileText, Library, Video, Trophy, Plug, Send } from "lucide-react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { CartDrawer, MobileCartBar } from "./components/CartPanel";
@@ -16,11 +16,33 @@ import { Login, Register } from "./pages/public/Auth";
 import Checkout from "./pages/public/Checkout";
 import NotFound from "./pages/public/NotFound";
 import PortalLayout from "./pages/portal/PortalLayout";
-import { Profile, Notifications } from "./pages/portal/Common";
-import { StudentHome, MyCourses, Learn, Orders, StudentAnnouncements } from "./pages/portal/student/Student";
-import { TeacherHome, TeacherCourses, TeacherCourse, TeacherStudents, TeacherAnnouncements } from "./pages/portal/teacher/Teacher";
-import { AdminHome, AdminOrders, AdminAccess, AdminUsers, AdminCourses, AdminLessons, AdminSettings, simple } from "./pages/portal/admin/Admin";
+import { Spinner } from "./components/ui";
+const Profile = lazy(() => import("./pages/portal/Common").then((m) => ({ default: m.Profile })));
+const Notifications = lazy(() => import("./pages/portal/Common").then((m) => ({ default: m.Notifications })));
+const StudentHome = lazy(() => import("./pages/portal/student/Student").then((m) => ({ default: m.StudentHome })));
+const MyCourses = lazy(() => import("./pages/portal/student/Student").then((m) => ({ default: m.MyCourses })));
+const Learn = lazy(() => import("./pages/portal/student/Student").then((m) => ({ default: m.Learn })));
+const Orders = lazy(() => import("./pages/portal/student/Student").then((m) => ({ default: m.Orders })));
+const StudentAnnouncements = lazy(() => import("./pages/portal/student/Student").then((m) => ({ default: m.StudentAnnouncements })));
+const TeacherHome = lazy(() => import("./pages/portal/teacher/Teacher").then((m) => ({ default: m.TeacherHome })));
+const TeacherCourses = lazy(() => import("./pages/portal/teacher/Teacher").then((m) => ({ default: m.TeacherCourses })));
+const TeacherCourse = lazy(() => import("./pages/portal/teacher/Teacher").then((m) => ({ default: m.TeacherCourse })));
+const TeacherStudents = lazy(() => import("./pages/portal/teacher/Teacher").then((m) => ({ default: m.TeacherStudents })));
+const TeacherAnnouncements = lazy(() => import("./pages/portal/teacher/Teacher").then((m) => ({ default: m.TeacherAnnouncements })));
+const AdminHome = lazy(() => import("./pages/portal/admin/Admin").then((m) => ({ default: m.AdminHome })));
+const AdminOrders = lazy(() => import("./pages/portal/admin/Admin").then((m) => ({ default: m.AdminOrders })));
+const AdminAccess = lazy(() => import("./pages/portal/admin/Admin").then((m) => ({ default: m.AdminAccess })));
+const AdminUsers = lazy(() => import("./pages/portal/admin/Admin").then((m) => ({ default: m.AdminUsers })));
+const AdminCourses = lazy(() => import("./pages/portal/admin/Admin").then((m) => ({ default: m.AdminCourses })));
+const AdminLessons = lazy(() => import("./pages/portal/admin/Admin").then((m) => ({ default: m.AdminLessons })));
+const simpleL = (k) => lazy(() => import("./pages/portal/admin/Admin").then((m) => ({ default: m.simple[k] })));
+const simple = Object.fromEntries(["payments", "carts", "orderItems", "programs", "levels", "sessions", "progress", "announcements", "notifications", "messages", "inquiries", "subscribers", "accounts", "activity", "quizAttempts", "messageLogs"].map((k) => [k, simpleL(k)]));
+const AdminSettings = lazy(() => import("./pages/portal/admin/Admin").then((m) => ({ default: m.AdminSettings })));
 import { OptionsCtx } from "./pages/portal/admin/options";
+const Integrations = lazy(() => import("./pages/portal/admin/Integrations"));
+const LiveManager = lazy(() => import("./pages/portal/live/Live").then((m) => ({ default: m.LiveManager })));
+const StudentLive = lazy(() => import("./pages/portal/live/Live").then((m) => ({ default: m.StudentLive })));
+const QuizManager = lazy(() => import("./pages/portal/quiz/Quiz").then((m) => ({ default: m.QuizManager })));
 
 function PublicLayout() {
   return (<><Header /><main id="main"><Outlet /></main><Footer /><CartDrawer /><MobileCartBar /></>);
@@ -44,21 +66,23 @@ function AdminShell(props) {
   return <OptionsCtx.Provider value={opts}><PortalLayout {...props} /></OptionsCtx.Provider>;
 }
 
-const studentNav = [{ items: [["/student", "Dashboard", LayoutDashboard], ["/student/courses", "My courses", BookOpen], ["/student/orders", "Orders & payments", Receipt], ["/student/announcements", "Announcements", Megaphone], ["/student/notifications", "Notifications", Bell], ["/student/profile", "Profile & password", UserRound]] }];
-const teacherNav = [{ items: [["/teacher", "Dashboard", LayoutDashboard], ["/teacher/courses", "My courses & lectures", PlayCircle], ["/teacher/students", "My students", Users], ["/teacher/announcements", "Announcements", Megaphone], ["/teacher/notifications", "Notifications", Bell], ["/teacher/profile", "Profile & password", UserRound]] }];
+const studentNav = [{ items: [["/student", "Dashboard", LayoutDashboard], ["/student/courses", "My courses", BookOpen], ["/student/live", "Live classes", Video], ["/student/orders", "Orders & payments", Receipt], ["/student/announcements", "Announcements", Megaphone], ["/student/notifications", "Notifications", Bell], ["/student/profile", "Profile & password", UserRound]] }];
+const teacherNav = [{ items: [["/teacher", "Dashboard", LayoutDashboard], ["/teacher/courses", "My courses & lectures", PlayCircle], ["/teacher/live", "Live classes", Video], ["/teacher/quizzes", "Quizzes & results", ListChecks], ["/teacher/students", "My students", Users], ["/teacher/announcements", "Announcements", Megaphone], ["/teacher/notifications", "Notifications", Bell], ["/teacher/profile", "Profile & password", UserRound]] }];
 const adminNav = [
   { items: [["/admin", "Dashboard", LayoutDashboard]] },
   { group: "Admissions", items: [["/admin/orders", "Orders & payment review", Receipt], ["/admin/access", "Course access", KeyRound], ["/admin/payments", "Payments", Wallet], ["/admin/carts", "Carts", ShoppingCart], ["/admin/order-items", "Order items", ListChecks]] },
   { group: "People", items: [["/admin/students", "Students", GraduationCap], ["/admin/teachers", "Teachers", Users], ["/admin/admins", "Administrators", ShieldCheck]] },
-  { group: "Academics", items: [["/admin/programs", "Programmes", Library], ["/admin/levels", "Levels", Layers], ["/admin/courses", "Courses", BookOpen], ["/admin/lessons", "Lessons & videos", PlayCircle], ["/admin/sessions", "Exam sessions", CalendarDays], ["/admin/progress", "Lesson progress", Activity]] },
+  { group: "Teaching", items: [["/admin/courses", "Courses & content", BookOpen], ["/admin/lessons", "All lectures & videos", PlayCircle], ["/admin/live", "Live classes", Video], ["/admin/quizzes", "Quizzes & MCQs", ListChecks], ["/admin/quiz-attempts", "Quiz results", Trophy], ["/admin/progress", "Lecture progress", Activity]] },
+  { group: "Academics", items: [["/admin/programs", "Programmes", Library], ["/admin/levels", "Levels", Layers], ["/admin/sessions", "Exam sessions", CalendarDays]] },
   { group: "Communication", items: [["/admin/announcements", "Announcements", Megaphone], ["/admin/notifications-sent", "User notifications", Bell], ["/admin/messages", "Contact messages", MessageSquare], ["/admin/inquiries", "Inquiries", PhoneCall], ["/admin/subscribers", "Subscribers", Mail]] },
-  { group: "System", items: [["/admin/payment-accounts", "Payment accounts", Landmark], ["/admin/settings", "Website settings", Settings], ["/admin/activity", "Activity log", FileText], ["/admin/notifications", "My notifications", Bell], ["/admin/profile", "My profile", UserRound]] },
+  { group: "System", items: [["/admin/integrations", "Integrations", Plug], ["/admin/message-log", "WhatsApp & email log", Send], ["/admin/payment-accounts", "Payment accounts", Landmark], ["/admin/settings", "Website settings", Settings], ["/admin/activity", "Activity log", FileText], ["/admin/notifications", "My notifications", Bell], ["/admin/profile", "My profile", UserRound]] },
 ];
 
 export default function App() {
   return (
     <>
       <Tracker />
+      <Suspense fallback={<Spinner />}>
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
@@ -83,6 +107,7 @@ export default function App() {
         <Route path="/student" element={<PortalLayout role="student" nav={studentNav} />}>
           <Route index element={<StudentHome />} />
           <Route path="courses" element={<MyCourses />} />
+          <Route path="live" element={<StudentLive />} />
           <Route path="learn/:slug" element={<Learn />} />
           <Route path="orders" element={<Orders />} />
           <Route path="announcements" element={<StudentAnnouncements />} />
@@ -94,6 +119,8 @@ export default function App() {
           <Route index element={<TeacherHome />} />
           <Route path="courses" element={<TeacherCourses />} />
           <Route path="courses/:id" element={<TeacherCourse />} />
+          <Route path="live" element={<LiveManager />} />
+          <Route path="quizzes" element={<QuizManager />} />
           <Route path="students" element={<TeacherStudents />} />
           <Route path="announcements" element={<TeacherAnnouncements />} />
           <Route path="notifications" element={<Notifications />} />
@@ -113,6 +140,12 @@ export default function App() {
           <Route path="programs" element={<simple.programs />} />
           <Route path="levels" element={<simple.levels />} />
           <Route path="courses" element={<AdminCourses />} />
+          <Route path="courses/:id" element={<TeacherCourse base="/admin" />} />
+          <Route path="live" element={<LiveManager admin />} />
+          <Route path="quizzes" element={<QuizManager admin />} />
+          <Route path="quiz-attempts" element={<simple.quizAttempts />} />
+          <Route path="message-log" element={<simple.messageLogs />} />
+          <Route path="integrations" element={<Integrations />} />
           <Route path="lessons" element={<AdminLessons />} />
           <Route path="sessions" element={<simple.sessions />} />
           <Route path="progress" element={<simple.progress />} />
@@ -128,6 +161,7 @@ export default function App() {
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
+      </Suspense>
     </>
   );
 }

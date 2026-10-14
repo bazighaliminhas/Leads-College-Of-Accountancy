@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams, useLocation } from "react-router-dom";
-import { ShieldCheck, GraduationCap, PlayCircle, CalendarClock, ChevronLeft, ChevronRight, Search, UserPlus, ShoppingCart, FileText, Upload, Unlock, ArrowRight, Landmark, Smartphone, BookOpenCheck } from "lucide-react";
+import { ShieldCheck, GraduationCap, PlayCircle, CalendarClock, ChevronLeft, ChevronRight, Search, UserPlus, ShoppingCart, FileText, Upload, Unlock, ArrowRight, Landmark, Smartphone, BookOpenCheck, Video, ListChecks, BellRing, CheckCircle2 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { api } from "../../lib/api";
 import CourseCard from "../../components/CourseCard";
@@ -109,7 +109,7 @@ export default function Home() {
       {/* TRUST STRIP */}
       <section className="trust">
         <div className="container trust-grid">
-          {[[GraduationCap, "ACCA & ICAP pathways", "Complete route coverage"], [BookOpenCheck, "Expert faculty", "Exam-focused teaching"], [PlayCircle, "Recorded lectures", "Watch anytime in your portal"], [CalendarClock, "Flexible sessions", "Choose your exam attempt"]].map(([I, a, b]) => (
+          {[[GraduationCap, "ACCA & ICAP pathways", "Complete route coverage"], [Video, "Live classes", "On Google Meet with reminders"], [PlayCircle, "Recorded lectures", "Watch anytime in your portal"], [ListChecks, "Quizzes & MCQs", "Instant marking & explanations"]].map(([I, a, b]) => (
             <div className="trust-item" key={a}><I size={26} /><div><strong>{a}</strong><span>{b}</span></div></div>
           ))}
         </div>
@@ -184,6 +184,26 @@ export default function Home() {
               <li key={t}><span className="step-no">{i + 1}</span><I size={26} /><strong>{t}</strong><p>{d}</p></li>
             ))}
           </ol>
+        </div>
+      </section>
+
+      {/* INSIDE THE PORTAL */}
+      <section className="section portal-showcase">
+        <div className="container showcase-grid">
+          <div className="showcase-copy">
+            <span className="eyebrow">Your learning portal</span>
+            <h2>Everything you need to pass — in one place</h2>
+            <p>As soon as the admin verifies your payment, your courses open with structured lectures, live classes and practice that tracks your progress.</p>
+            <ul className="showcase-list">
+              {["Lecture 1, Lecture 2 … in syllabus order, with progress tracking", "Live class links on WhatsApp, email and your dashboard", "Add classes to Google Calendar — your phone reminds you", "Practice quizzes with explanations after every lecture"].map((t) => <li key={t}><CheckCircle2 size={18} /> {t}</li>)}
+            </ul>
+            <Link to="/register" className="btn btn-primary btn-lg">Create your student account <ArrowRight size={18} /></Link>
+          </div>
+          <div className="showcase-cards">
+            {[[Video, "Live classes on Google Meet", "Join your teacher live. One tap to join, one tap to save it in your calendar.", "red"], [PlayCircle, "Video lectures", "Watch, pause and re-watch every lecture — on your phone or laptop.", "navy"], [BookOpenCheck, "Study material", "Clear notes for each lecture: key concepts, worked examples and exam tips.", "gold"], [ListChecks, "Quizzes & MCQs", "Exam-style questions with instant results and explanations.", "green"], [BellRing, "WhatsApp & email updates", "Admission, payment, new lectures and class reminders — straight to your phone.", "navy"]].map(([I, t, d, tone]) => (
+              <div key={t} className={`show-card t-${tone}`}><span className="show-icon"><I size={22} /></span><div><strong>{t}</strong><p>{d}</p></div></div>
+            ))}
+          </div>
         </div>
       </section>
 

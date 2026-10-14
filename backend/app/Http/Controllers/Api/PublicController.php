@@ -11,7 +11,9 @@ use App\Models\PaymentAccount;
 use App\Models\Program;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\UserNotification;
 use App\Support\Activity;
+use App\Support\Notify;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -25,7 +27,7 @@ class PublicController extends Controller
 
     public function site()
     {
-        $data = Cache::remember('lca_public_site', 300, function () {
+        $data = Cache::remember('lca_public_site_'.self::cacheVersion(), 300, function () {
             return [
                 'settings' => Setting::allPublic(),
                 'programs' => Program::where('status', 'active')->orderBy('sort_order')
@@ -36,6 +38,17 @@ class PublicController extends Controller
         return response()->json($data);
     }
 
+    public static function cacheVersion(): int
+    {
+        return (int) Cache::get('lca_cache_v', 1);
+    }
+
+    /** Called after any admin change so the public website shows it immediately. */
+    public static function flushCache(): void
+    {
+        Cache::forever('lca_cache_v', self::cacheVersion() + 1);
+    }
+
     public function courses(Request $request)
     {
         $program = $request->program;
@@ -44,7 +57,7 @@ class PublicController extends Controller
         $search = $request->search;
 
         if (!$search) {
-            $cacheKey = 'lca_courses_'.($program ?? 'all').'_'.($level ?? 'all').'_'.($featured ? '1' : '0');
+            $cacheKey = 'lca_courses_'.self::cacheVersion().'_'.($program ?? 'all').'_'.($level ?? 'all').'_'.($featured ? '1' : '0');
             $data = Cache::remember($cacheKey, 180, function () use ($program, $level, $featured) {
                 $q = $this->courseCard(Course::query());
                 if ($program) $q->whereHas('program', fn ($p) => $p->where('slug', $program));
@@ -101,6 +114,7 @@ class PublicController extends Controller
         $data = $request->validate(['name' => 'required|max:120', 'email' => 'required|email', 'phone' => 'nullable|max:30', 'subject' => 'nullable|max:200', 'message' => 'required|max:5000']);
         $m = ContactMessage::create($data + ['ip' => $request->ip()]);
         Activity::log('contact.submit', "Contact message from {$m->email}", $m);
+        Notify::contact($m);
         return response()->json(['message' => 'Thank you! Our admissions team will get back to you shortly.']);
     }
 
@@ -109,6 +123,7 @@ class PublicController extends Controller
         $data = $request->validate(['name' => 'required|max:120', 'email' => 'required|email', 'phone' => 'required|max:30', 'program' => 'nullable|max:50', 'qualification' => 'nullable|max:150', 'city' => 'nullable|max:80', 'message' => 'nullable|max:3000']);
         $m = Inquiry::create($data + ['ip' => $request->ip()]);
         Activity::log('inquiry.submit', "Admission inquiry from {$m->email}", $m);
+        Notify::inquiry($m);
         return response()->json(['message' => 'Your admission inquiry has been received. A counsellor will call you soon.']);
     }
 

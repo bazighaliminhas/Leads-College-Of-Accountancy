@@ -2,31 +2,25 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Concerns\ManagesCourses;
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Lesson;
+use App\Models\Level;
 use App\Models\LessonProgress;
 use App\Models\User;
 use App\Models\UserNotification;
 use App\Support\Activity;
+use App\Support\Notify;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class TeacherController extends Controller
 {
-    protected function myCourseIds(User $u)
-    {
-        return $u->teachingCourses()->pluck('courses.id')->merge(Course::where('created_by', $u->id)->pluck('id'))->unique()->values();
-    }
-
-    protected function ownCourse(Request $request, Course $course): Course
-    {
-        abort_unless($this->myCourseIds($request->user())->contains($course->id), 403, 'This course is not assigned to you.');
-        return $course;
-    }
+    use ManagesCourses;
 
     public function dashboard(Request $request)
     {
@@ -37,7 +31,10 @@ class TeacherController extends Controller
                 'lessons' => Lesson::whereIn('course_id', $ids)->count(),
                 'students' => Enrollment::whereIn('course_id', $ids)->where('status', 'active')->distinct('user_id')->count('user_id'),
                 'pending_courses' => Course::whereIn('id', $ids)->where('status', 'pending')->count(),
+                'live_upcoming' => \App\Models\LiveClass::whereIn('course_id', $ids)->where('status', 'scheduled')->where('starts_at', '>=', now()->subHours(2))->count(),
+                'quizzes' => \App\Models\Quiz::whereIn('course_id', $ids)->count(),
             ],
+            'live' => \App\Models\LiveClass::with('course:id,code,title')->whereIn('course_id', $ids)->whereIn('status', ['scheduled', 'draft'])->where('starts_at', '>=', now()->subHours(2))->orderBy('starts_at')->limit(5)->get(),
             'courses' => $this->coursesQuery($ids)->get(),
             'announcements' => Announcement::where('is_published', true)->whereIn('audience', ['all', 'teachers'])->latest()->limit(5)->get(),
         ]);
@@ -46,7 +43,7 @@ class TeacherController extends Controller
     protected function coursesQuery($ids)
     {
         return Course::whereIn('id', $ids)->with(['program:id,name,slug', 'level:id,name'])
-            ->withCount(['lessons', 'enrollments as students_count' => fn ($q) => $q->where('status', 'active')])->orderBy('program_id')->orderBy('sort_order');
+            ->withCount(['lessons', 'quizzes', 'liveClasses', 'enrollments as students_count' => fn ($q) => $q->where('status', 'active')])->orderBy('program_id')->orderBy(Level::select('sort_order')->whereColumn('levels.id', 'courses.level_id'))->orderBy('sort_order');
     }
 
     public function courses(Request $request)
@@ -58,8 +55,8 @@ class TeacherController extends Controller
     {
         $this->ownCourse($request, $course);
         $course->load(['program', 'level', 'teachers:id,name']);
-        $lessons = $course->lessons()->with('uploader:id,name')->get()->map(fn ($l) => StudentController::lessonPayload($l) + ['uploader' => $l->uploader?->name, 'file_size' => $l->file_size, 'created_at' => $l->created_at]);
-        return response()->json(['course' => $course, 'lessons' => $lessons]);
+        $lessons = $course->lessons()->with('uploader:id,name')->withCount('quizzes')->get()->map(fn ($l) => StudentController::lessonPayload($l) + ['uploader' => $l->uploader?->name, 'file_size' => $l->file_size, 'created_at' => $l->created_at, 'quizzes_count' => $l->quizzes_count]);
+        return response()->json(['course' => $course, 'lessons' => $lessons, 'students' => Notify::courseStudents($course->id)->count()]);
     }
 
     protected function courseRules(): array
@@ -94,7 +91,7 @@ class TeacherController extends Controller
         $course = Course::create($data);
         $course->teachers()->attach($request->user()->id, ['assigned_by' => $request->user()->id]);
         Activity::log('teacher.course.create', "Teacher created course {$course->code} (pending approval)", $course, $data);
-        User::where('role', 'admin')->pluck('id')->each(fn ($id) => UserNotification::create(['user_id' => $id, 'title' => 'Course awaiting approval', 'body' => "{$request->user()->name} added {$course->code} {$course->title}", 'link' => '/admin/courses']));
+        Notify::admins(['title' => 'Course awaiting approval', 'wa_icon' => '📘 ', 'body' => "{$request->user()->name} added {$course->code} {$course->title} and it is waiting for your approval.", 'link' => '/admin/courses', 'cta' => 'Review course']);
         return response()->json($course, 201);
     }
 
@@ -118,7 +115,7 @@ class TeacherController extends Controller
         $lesson = new Lesson(['course_id' => $course->id, 'uploaded_by' => $request->user()->id]);
         $this->fillLesson($request, $lesson, $data);
         Activity::log('lesson.create', "Lesson '{$lesson->title}' added to {$course->code}", $lesson, $data);
-        $this->notifyStudents($course, "New lesson in {$course->code}", $lesson->title);
+        if ($lesson->is_published) Notify::lessonPublished($lesson);
         return response()->json(StudentController::lessonPayload($lesson), 201);
     }
 
@@ -126,7 +123,9 @@ class TeacherController extends Controller
     {
         $this->ownCourse($request, $lesson->course);
         $data = $this->validateLesson($request, false);
+        $wasPublished = (bool) $lesson->is_published;
         $this->fillLesson($request, $lesson, $data);
+        if (!$wasPublished && $lesson->is_published) Notify::lessonPublished($lesson);
         Activity::log('lesson.update', "Lesson '{$lesson->title}' updated", $lesson, $data);
         return response()->json(StudentController::lessonPayload($lesson));
     }
@@ -149,6 +148,10 @@ class TeacherController extends Controller
             'type' => 'nullable|in:video,document,text',
             'video_url' => 'nullable|url|max:500',
             'content' => 'nullable|string',
+            'study_material' => 'nullable|string|max:200000',
+            'objectives' => 'nullable|array',
+            'objectives.*' => 'nullable|string|max:500',
+            'ai_generated' => 'nullable|boolean',
             'duration_minutes' => 'nullable|integer|min:0',
             'sort_order' => 'nullable|integer',
             'is_published' => 'nullable|boolean',
@@ -160,6 +163,7 @@ class TeacherController extends Controller
     public static function fillLesson(Request $request, Lesson $lesson, array $data): void
     {
         unset($data['video'], $data['attachment']);
+        if (array_key_exists('objectives', $data)) $data['objectives'] = array_values(array_filter((array) $data['objectives']));
         $lesson->fill($data);
         if ($request->hasFile('video')) {
             if ($lesson->video_path) Storage::disk('local')->delete($lesson->video_path);
@@ -187,12 +191,6 @@ class TeacherController extends Controller
         foreach ([$l->video_path, $l->attachment_path] as $p) if ($p) Storage::disk('local')->delete($p);
     }
 
-    protected function notifyStudents(Course $course, string $title, string $body): void
-    {
-        Enrollment::where('course_id', $course->id)->where('status', 'active')->pluck('user_id')
-            ->each(fn ($id) => UserNotification::create(['user_id' => $id, 'title' => $title, 'body' => $body, 'link' => '/student/learn/'.$course->slug]));
-    }
-
     public function students(Request $request)
     {
         $ids = $this->myCourseIds($request->user());
@@ -214,7 +212,7 @@ class TeacherController extends Controller
         $data = $request->validate(['course_id' => 'required|exists:courses,id', 'title' => 'required|max:200', 'body' => 'required|max:5000']);
         $course = $this->ownCourse($request, Course::findOrFail($data['course_id']));
         $a = Announcement::create($data + ['user_id' => $request->user()->id, 'audience' => 'course', 'is_published' => true]);
-        $this->notifyStudents($course, "Announcement: {$a->title}", mb_substr($a->body, 0, 200));
+        Notify::announcement($a, $course);
         Activity::log('announcement.create', "Teacher announcement for {$course->code}", $a, $data);
         return response()->json($a, 201);
     }

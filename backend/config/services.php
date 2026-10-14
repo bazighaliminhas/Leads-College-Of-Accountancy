@@ -31,4 +31,18 @@ return [
         ],
     ],
 
+    // AI study material / curriculum / quiz generation. Provider: gemini | openai | anthropic
+    'ai' => [
+        'provider' => env('AI_PROVIDER', 'gemini'),
+        'key' => env('AI_API_KEY'),
+        'model' => env('AI_MODEL'),
+    ],
+
+    // Google Calendar + Meet (OAuth client from Google Cloud Console)
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
 ];

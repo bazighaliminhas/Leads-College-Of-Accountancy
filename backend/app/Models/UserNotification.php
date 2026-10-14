@@ -9,4 +9,5 @@ class UserNotification extends Model
     protected $guarded = ['id'];
     protected $casts = ["read_at" => "datetime"];
     public function user() { return $this->belongsTo(User::class); }
+
 }

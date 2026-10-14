@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Bell, LogOut, Menu, X, Home, ExternalLink } from "lucide-react";
 import { useApp } from "../../context/AppContext";
@@ -43,7 +43,7 @@ export default function PortalLayout({ role, nav }) {
           <Link to={`/${role}/notifications`} className="icon-btn bell" aria-label="Notifications"><Bell size={20} />{unread > 0 && <span className="dot">{unread > 9 ? "9+" : unread}</span>}</Link>
           <Link to={`/${role}/profile`} className="top-user"><Avatar src={user.avatar_url} name={user.name} size={36} /><span className="hide-sm"><strong>{user.name}</strong><small>@{user.username}</small></span></Link>
         </header>
-        <main className="portal-content"><Outlet /></main>
+        <main className="portal-content"><Suspense fallback={<Spinner />}><Outlet /></Suspense></main>
       </div>
     </div>
   );

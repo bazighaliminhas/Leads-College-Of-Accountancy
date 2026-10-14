@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AdminResourceController;
+use App\Http\Controllers\Api\AiController;
+use App\Http\Controllers\Api\GoogleController;
+use App\Http\Controllers\Api\LiveClassController;
+use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CheckoutController;
@@ -56,10 +60,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/orders', [StudentController::class, 'orders']);
         Route::get('/orders/{order}', [StudentController::class, 'order']);
         Route::get('/announcements', [StudentController::class, 'announcements']);
+        Route::get('/live', [LiveClassController::class, 'studentIndex']);
+        Route::get('/quizzes/{quiz}', [QuizController::class, 'take']);
+        Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit'])->middleware('throttle:20,1');
     });
 
-    // ---------- Teacher ----------
-    Route::middleware('role:teacher')->prefix('teacher')->group(function () {
+    // ---------- Teacher (admins may use every teacher tool for any course) ----------
+    Route::middleware('role:teacher,admin')->prefix('teacher')->group(function () {
         Route::get('/dashboard', [TeacherController::class, 'dashboard']);
         Route::get('/courses', [TeacherController::class, 'courses']);
         Route::post('/courses', [TeacherController::class, 'storeCourse']);
@@ -72,6 +79,38 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/announcements', [TeacherController::class, 'announcements']);
         Route::post('/announcements', [TeacherController::class, 'storeAnnouncement']);
         Route::delete('/announcements/{announcement}', [TeacherController::class, 'destroyAnnouncement']);
+
+        // Live classes (Google Meet)
+        Route::get('/live', [LiveClassController::class, 'index']);
+        Route::post('/live', [LiveClassController::class, 'store']);
+        Route::post('/live/{liveClass}', [LiveClassController::class, 'update']);
+        Route::post('/live/{liveClass}/generate-link', [LiveClassController::class, 'generateLink']);
+        Route::post('/live/{liveClass}/publish', [LiveClassController::class, 'publish']);
+        Route::post('/live/{liveClass}/cancel', [LiveClassController::class, 'cancel']);
+        Route::post('/live/{liveClass}/complete', [LiveClassController::class, 'complete']);
+        Route::delete('/live/{liveClass}', [LiveClassController::class, 'destroy']);
+
+        // Quizzes, MCQs and short questions
+        Route::get('/quizzes', [QuizController::class, 'index']);
+        Route::post('/quizzes', [QuizController::class, 'store']);
+        Route::get('/quizzes/{quiz}', [QuizController::class, 'show']);
+        Route::post('/quizzes/{quiz}', [QuizController::class, 'update']);
+        Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy']);
+        Route::get('/quizzes/{quiz}/results', [QuizController::class, 'results']);
+
+        // AI assistant
+        Route::get('/ai/status', [AiController::class, 'status']);
+        Route::middleware('throttle:30,1')->group(function () {
+            Route::post('/ai/curriculum', [AiController::class, 'curriculum']);
+            Route::post('/ai/curriculum/apply', [AiController::class, 'applyCurriculum']);
+            Route::post('/ai/study-material', [AiController::class, 'studyMaterial']);
+            Route::post('/ai/quiz', [AiController::class, 'quiz']);
+        });
+
+        // Google account for automatic Meet links
+        Route::get('/google', [GoogleController::class, 'status']);
+        Route::post('/google/connect', [GoogleController::class, 'connect']);
+        Route::delete('/google/connect', [GoogleController::class, 'disconnect']);
     });
 
     // ---------- Admin (full access) ----------
@@ -85,6 +124,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/courses/{course}/teachers', [AdminController::class, 'assignTeachers']);
         Route::get('/settings', [AdminController::class, 'settings']);
         Route::post('/settings', [AdminController::class, 'saveSettings']);
+        Route::post('/whatsapp/send', [AdminController::class, 'sendWhatsApp']);
+        Route::post('/whatsapp/test', [AdminController::class, 'testWhatsApp']);
+        Route::get('/integrations', [AdminController::class, 'integrations']);
+        Route::post('/email/test', [AdminController::class, 'testEmail']);
+        Route::post('/messages/retry', [AdminController::class, 'retryMessages']);
 
         Route::get('/r/{resource}', [AdminResourceController::class, 'index']);
         Route::post('/r/{resource}', [AdminResourceController::class, 'store']);

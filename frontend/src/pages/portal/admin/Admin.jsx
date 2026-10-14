@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Users, GraduationCap, BookOpen, Receipt, Hourglass, Wallet, KeyRound, MessageSquare, CheckCircle2, XCircle, FileText, UserCheck, Link2, PlayCircle, Ban, Unlock, Lock } from "lucide-react";
+import { Users, GraduationCap, BookOpen, Receipt, Hourglass, Wallet, KeyRound, MessageSquare, CheckCircle2, XCircle, FileText, UserCheck, Link2, PlayCircle, Ban, Unlock, Lock, Video, ListChecks, Send, Mail, Sparkles, Plug, RefreshCw, AlertTriangle, Settings2 } from "lucide-react";
 import { api, errMsg } from "../../../lib/api";
 import { useApp } from "../../../context/AppContext";
 import { pkr, dateTime, date } from "../../../lib/format";
 import { Badge, Spinner, Modal, Field, Btn, Empty } from "../../../components/ui";
 import LessonForm from "../../../components/LessonForm";
 import { PageHead, Stat } from "../PortalLayout";
+import { LiveWidget, GoogleConnect } from "../live/Live";
 import ResourceManager, { AutoForm } from "./ResourceManager";
 import { useAdminOptions } from "./options";
 
@@ -38,6 +39,10 @@ export function AdminHome() {
         <Stat icon={BookOpen} label={`Courses (${c.pending_courses} pending)`} value={c.courses} to="/admin/courses" />
         <Stat icon={UserCheck} label="Active enrolments" value={c.active_enrollments} tone="green" to="/admin/access" />
         <Stat icon={MessageSquare} label="New messages / inquiries" value={`${c.new_messages} / ${c.new_inquiries}`} to="/admin/messages" />
+        <Stat icon={Video} label="Upcoming live classes" value={c.live_upcoming} tone="red" to="/admin/live" />
+        <Stat icon={ListChecks} label="Quizzes" value={c.quizzes} to="/admin/quizzes" />
+        <Stat icon={Send} label="WhatsApp + email sent (7 days)" value={c.messages_sent} tone="green" to="/admin/message-log" />
+        <Stat icon={AlertTriangle} label="Failed messages (7 days)" value={c.messages_failed} tone={c.messages_failed ? "amber" : "navy"} to="/admin/integrations" />
       </div>
       <div className="grid-2-1">
         <div className="card">
@@ -52,6 +57,8 @@ export function AdminHome() {
           <h3 className="mt">Quick actions</h3>
           <div className="quick">
             <Link to="/admin/teachers" className="btn btn-outline btn-sm">Create teacher login</Link>
+            <Link to="/admin/live?new=1" className="btn btn-outline btn-sm">Schedule live class</Link>
+            <Link to="/admin/integrations" className="btn btn-outline btn-sm">WhatsApp / email / AI / Google</Link>
             <Link to="/admin/courses" className="btn btn-outline btn-sm">Add course</Link>
             <Link to="/admin/access" className="btn btn-outline btn-sm">Grant course access</Link>
             <Link to="/admin/payment-accounts" className="btn btn-outline btn-sm">Bank / wallet accounts</Link>
@@ -59,6 +66,7 @@ export function AdminHome() {
           </div>
         </div>
       </div>
+      <LiveWidget list={d.live} role="admin" />
       <div className="grid-2">
         <div className="card flush"><div className="card-head pad"><h3>Recent orders</h3><Link to="/admin/orders">All orders</Link></div>
           <div className="table-wrap"><table className="table compact"><tbody>{d.recent_orders.map((o) => <tr key={o.id}><td><strong>{o.order_no}</strong><br /><small className="muted">{o.user?.name}</small></td><td><Badge status={o.status} /></td><td className="num">{pkr(o.total)}</td></tr>)}</tbody></table></div></div>
@@ -105,7 +113,11 @@ function OrderReview({ order, onClose, onDone }) {
   const [remarks, setRemarks] = useState("");
   const [expires, setExpires] = useState("");
   const [busy, setBusy] = useState(null);
-  useEffect(() => { setRemarks(order?.admin_remarks || ""); setExpires(""); }, [order]);
+  const [waText, setWaText] = useState("");
+  const [showWa, setShowWa] = useState(false);
+  const [waBusy, setWaBusy] = useState(false);
+
+  useEffect(() => { setRemarks(order?.admin_remarks || ""); setExpires(""); setShowWa(false); setWaText(""); }, [order]);
   if (!order) return null;
   const act = async (kind, grant = true) => {
     if (kind === "reject" && !remarks.trim()) { toast("Please write the reason for rejection in the remarks.", "bad"); return; }
@@ -113,23 +125,41 @@ function OrderReview({ order, onClose, onDone }) {
     try {
       if (kind === "approve") await api.post(`/admin/orders/${order.id}/approve`, { grant_access: grant, remarks, access_expires_on: expires || null });
       else await api.post(`/admin/orders/${order.id}/reject`, { remarks });
-      toast(kind === "approve" ? (grant ? "Payment verified and course access granted" : "Payment verified") : "Order rejected — student notified");
+      toast(kind === "approve" ? (grant ? "Payment verified and course access granted (WhatsApp sent)" : "Payment verified") : "Order rejected — student notified via WhatsApp");
       onDone();
     } catch (e) { toast(errMsg(e), "bad"); } finally { setBusy(null); }
   };
+
+  const sendDirectWa = async () => {
+    if (!waText.trim()) return;
+    setWaBusy(true);
+    try {
+      await api.post("/admin/whatsapp/send", { phone: order.phone, message: waText });
+      toast("WhatsApp delivered to student successfully!");
+      setWaText("");
+      setShowWa(false);
+    } catch (e) {
+      toast(errMsg(e), "bad");
+    } finally {
+      setWaBusy(false);
+    }
+  };
+
   return (
     <Modal open onClose={onClose} title={`Review ${order.order_no}`} size="xl">
       <div className="review">
         <div>
           <h4>Student details</h4>
           <dl className="kv">
-            {[["Name", `${order.first_name} ${order.last_name || ""}`], ["Account", order.user ? `${order.user.name} (@${order.user.username})` : "—"], ["Email", order.email], ["Phone / WhatsApp", order.phone], ["Date of birth", date(order.dob)], ["CNIC", order.cnic], ["City / country", `${order.city || "—"}, ${order.country || "—"}`], ["Registration no.", order.registration_no], ["Qualification", order.qualification], ["Address", order.address], ["Notes", order.notes], ["Terms accepted", dateTime(order.agreed_terms_at)], ["IP", order.ip]].map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v || "—"}</dd></div>)}
+            {[["Name", `${order.first_name} ${order.last_name || ""}`], ["Account", order.user ? `${order.user.name} (@${order.user.username})` : "—"], ["Email", order.email], ["Phone / WhatsApp", order.phone ? <span>{order.phone} <a href={`https://wa.me/${order.phone.replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer" className="btn btn-xs btn-outline" style={{ marginLeft: 6 }}>💬 Web</a></span> : "—"], ["Date of birth", date(order.dob)], ["CNIC", order.cnic], ["City / country", `${order.city || "—"}, ${order.country || "—"}`], ["Registration no.", order.registration_no], ["Qualification", order.qualification], ["Address", order.address], ["Notes", order.notes], ["Terms accepted", dateTime(order.agreed_terms_at)], ["IP", order.ip]].map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v || "—"}</dd></div>)}
           </dl>
           <h4>Order</h4>
-          <table className="table compact"><tbody>
-            {order.items.map((i) => <tr key={i.id}><td><span className="tag">{i.code}</span></td><td>{i.title}{i.session_name && <small className="muted"> · {i.session_name}</small>}</td><td className="num">{pkr(i.price)}</td></tr>)}
-            <tr className="total-row"><td colSpan={2}>Total</td><td className="num">{pkr(order.total)}</td></tr>
-          </tbody></table>
+          <div className="table-wrap">
+            <table className="table compact"><tbody>
+              {order.items.map((i) => <tr key={i.id}><td><span className="tag">{i.code}</span></td><td>{i.title}{i.session_name && <small className="muted"> · {i.session_name}</small>}</td><td className="num">{pkr(i.price)}</td></tr>)}
+              <tr className="total-row"><td colSpan={2}>Total</td><td className="num">{pkr(order.total)}</td></tr>
+            </tbody></table>
+          </div>
         </div>
         <div>
           <h4>Payment proofs</h4>
@@ -149,6 +179,21 @@ function OrderReview({ order, onClose, onDone }) {
             <Btn loading={busy === "approvetrue"} className="btn btn-success btn-block" onClick={() => act("approve", true)}><CheckCircle2 size={18} /> Verify payment &amp; grant course access</Btn>
             <Btn loading={busy === "approvefalse"} className="btn btn-outline btn-block" onClick={() => act("approve", false)}>Verify payment only (grant access later)</Btn>
             <Btn loading={busy === "rejecttrue"} className="btn btn-danger btn-block" onClick={() => act("reject")}><XCircle size={18} /> Reject payment</Btn>
+          </div>
+          <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid var(--border, #e2e8f0)" }}>
+            {!showWa ? (
+              <button type="button" className="btn btn-outline btn-block btn-sm" onClick={() => { setWaText(`Dear ${order.first_name},\nRegarding your application ${order.order_no} at Leads College of Accountancy: `); setShowWa(true); }}>
+                💬 Send Direct WhatsApp to Student (Kapso)
+              </button>
+            ) : (
+              <div style={{ background: "rgba(37, 211, 102, 0.06)", padding: 12, borderRadius: 8, border: "1px solid rgba(37, 211, 102, 0.25)" }}>
+                <Field label={`Send WhatsApp to ${order.phone}`}><textarea rows={3} value={waText} onChange={(e) => setWaText(e.target.value)} /></Field>
+                <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                  <Btn loading={waBusy} className="btn btn-primary btn-sm" onClick={sendDirectWa}>Send Message</Btn>
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowWa(false)}>Cancel</button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -230,7 +275,10 @@ const userFields = (role) => [
   { name: "status", label: "Account status", type: "select", options: [["active", "Active"], ["blocked", "Blocked"]], required: true, default: "active" },
   { name: "phone", label: "Phone / WhatsApp" },
   ...(role === "student" ? [{ name: "father_name", label: "Father's name" }, { name: "dob", label: "Date of birth", type: "date" }, { name: "cnic", label: "CNIC" }, { name: "registration_no", label: "ACCA / ICAP registration no." }, { name: "qualification", label: "Qualification" }] : []),
-  ...(role === "teacher" ? [{ name: "designation", label: "Designation" }, { name: "specialization", label: "Specialization" }, { name: "qualification", label: "Qualification" }, { name: "bio", label: "Bio (shown on website)", type: "textarea" }] : []),
+  ...(role === "teacher" ? [
+    { name: "course_ids", label: "Courses this teacher teaches", type: "courses", full: true, hint: "The teacher can only see, upload lectures, create quizzes and schedule live classes for these courses." },
+    { name: "designation", label: "Designation" }, { name: "specialization", label: "Specialization" }, { name: "qualification", label: "Qualification" }, { name: "bio", label: "Bio (shown on website)", type: "textarea" },
+    { name: "send_credentials", label: "Login details", type: "checkbox", checkLabel: "Send username, password and course list to the teacher by WhatsApp + email", full: true }] : []),
   { name: "city", label: "City" }, { name: "country", label: "Country" }, { name: "address", label: "Address", full: true },
   { name: "avatar", label: "Photo", type: "image" },
 ];
@@ -243,12 +291,12 @@ const userCols = [
 
 export function AdminUsers({ role }) {
   const [assign, setAssign] = useState(null);
-  const titles = { student: ["Students", "Edit student details, usernames and passwords, or block accounts."], teacher: ["Teachers", "Create teacher logins, reset passwords and assign courses they can upload lectures for."], admin: ["Administrators", "People with full access to this admin panel."] };
+  const titles = { student: ["Students", "Edit student details, usernames and passwords, or block accounts."], teacher: ["Teachers", "Create a teacher login and tick the courses they teach — that is exactly what the teacher sees and can upload lectures, quizzes and live classes for."], admin: ["Administrators", "People with full access to this admin panel."] };
   return (
     <>
       <ResourceManager key={role} resource="users" title={titles[role][0]} sub={titles[role][1]} fixed={{ role }} defaults={{ status: "active" }} fields={userFields(role)}
         filters={[{ name: "status", label: "Status", options: [["active", "Active"], ["blocked", "Blocked"]] }]}
-        columns={[...userCols.slice(0, 2), ...(role === "student" ? [{ key: "registration_no", label: "Reg. no." }, { key: "city", label: "City" }] : role === "teacher" ? [{ key: "designation", label: "Designation" }] : []), ...userCols.slice(2)]}
+        columns={[...userCols.slice(0, 2), ...(role === "student" ? [{ key: "registration_no", label: "Reg. no." }, { key: "city", label: "City" }] : role === "teacher" ? [{ key: "teaching_courses", label: "Teaches", render: (r) => r.teaching_courses?.length ? <div className="tag-wrap">{r.teaching_courses.map((c) => <span key={c.id} className="tag" title={c.title}>{c.code}</span>)}</div> : <span className="badge badge-warn">No course assigned</span>, csv: (r) => (r.teaching_courses || []).map((c) => c.code).join(" ") }] : []), ...userCols.slice(2)]}
         rowActions={role === "teacher" ? (r) => <button className="btn btn-sm btn-outline" onClick={() => setAssign(r)}><Link2 size={14} /> Courses</button> : undefined} />
       {assign && <TeacherCourses teacher={assign} onClose={() => setAssign(null)} />}
     </>
@@ -298,14 +346,14 @@ export function AdminCourses() {
           { key: "title", label: "Course", render: (r) => <><strong>{r.title}</strong><br /><small className="muted">{r.program?.name} · {r.level?.name}</small></> },
           { key: "teachers", label: "Teachers", render: (r) => r.teachers?.map((t) => t.name).join(", ") || <span className="muted">none</span>, csv: (r) => r.teachers?.map((t) => t.name).join("; ") },
           { key: "fee", label: "Fee", type: "money" },
-          { key: "lessons_count", label: "Lessons", num: true },
+          { key: "lessons_count", label: "Lectures", num: true },
           { key: "enrollments_count", label: "Students", num: true },
           { key: "status", label: "Status", type: "status" },
         ]}
         rowActions={(r) => <>
           {r.status === "pending" && <button className="btn btn-sm btn-success" onClick={async () => { await api.post(`/admin/r/courses/${r.id}`, { status: "published" }); toast("Course published"); setKey((k) => k + 1); }}>Approve</button>}
           <button className="btn btn-sm btn-outline" onClick={() => setAssign(r)}><Users size={14} /> Teachers</button>
-          <Link className="btn btn-sm btn-ghost" to={`/admin/lessons?course_id=${r.id}`}><PlayCircle size={14} /> Lessons</Link>
+          <Link className="btn btn-sm btn-primary" to={`/admin/courses/${r.id}`}><PlayCircle size={14} /> Content</Link>
         </>}
         fields={[
           { name: "program_id", label: "Programme", type: "select", options: progOpts, required: true }, { name: "level_id", label: "Level", type: "select", options: levelOpts },
@@ -373,13 +421,18 @@ export function AdminSettings() {
   const [list, setList] = useState(null);
   const [vals, setVals] = useState({});
   const [busy, setBusy] = useState(false);
+
   useEffect(() => { api.get("/admin/settings").then((r) => { setList(r.data); setVals(Object.fromEntries(r.data.map((s) => [s.key, s.value ?? ""]))); }); }, []);
   if (!list) return <Spinner />;
+
   const groups = list.reduce((m, s) => { (m[s.group] ||= []).push(s); return m; }, {});
   const save = async (e) => { e.preventDefault(); setBusy(true); try { await api.post("/admin/settings", { settings: vals }); toast("Settings saved — refresh the website to see changes"); } catch (er) { toast(errMsg(er), "bad"); } finally { setBusy(false); } };
   return (
     <form onSubmit={save}>
       <PageHead title="Website settings" sub="Contact details, promo text, fee notes, payment instructions, terms and privacy policy." actions={<Btn loading={busy}>Save settings</Btn>} />
+
+      <div className="alert alert-info"><Plug size={18} /> WhatsApp, email, AI and Google Meet are managed in <Link to="/admin/integrations">Integrations</Link>.</div>
+
       {Object.entries(groups).map(([g, items]) => (
         <div className="card" key={g}><h3 className="cap">{g}</h3><div className="form-grid">
           {items.map((s) => {
@@ -425,14 +478,14 @@ export const simple = {
     columns={[{ key: "title", label: "Title" }, { key: "audience", label: "Audience", render: (r) => r.audience === "course" ? `Course ${r.course?.code}` : r.audience }, { key: "author", label: "By", render: (r) => r.author?.name }, { key: "is_published", label: "Published", type: "bool" }, { key: "created_at", label: "Date", type: "date" }]}
     fields={[{ name: "title", label: "Title", required: true }, { name: "audience", label: "Audience", type: "select", options: ["all", "students", "teachers", "course"], required: true }, { name: "course_id", label: "Course", type: "select", options: courseOpts, showIf: (f) => f.audience === "course" },
       { name: "is_published", label: "Published", type: "checkbox", default: true }, { name: "body", label: "Message", type: "textarea", required: true }]} />,
-  notifications: () => <ResourceManager resource="notifications" title="User notifications" sub="Send a direct notification to any user."
+  notifications: () => <ResourceManager resource="notifications" title="User notifications" sub="Send a direct notification to any user. Also dispatches an instant WhatsApp message to their phone."
     columns={[{ key: "user", label: "User", render: (r) => who(r.user) }, { key: "title", label: "Title" }, { key: "type", label: "Type" }, { key: "read_at", label: "Read", render: (r) => r.read_at ? dateTime(r.read_at) : "Unread" }, { key: "created_at", label: "Sent", type: "date" }]}
-    fields={[{ name: "user_id", label: "User ID", type: "number", required: true, hint: "See Students / Teachers list for IDs" }, { name: "type", label: "Type", type: "select", options: ["info", "success", "error", "admin"] }, { name: "title", label: "Title", required: true }, { name: "link", label: "Link (e.g. /student/courses)" }, { name: "body", label: "Message", type: "textarea" }]} />,
+    fields={[{ name: "user_id", label: "User ID", type: "number", required: true, hint: "See Students / Teachers list for IDs. Recipient receives portal notification + WhatsApp message." }, { name: "type", label: "Type", type: "select", options: ["info", "success", "error", "admin"] }, { name: "title", label: "Title", required: true }, { name: "link", label: "Link (e.g. /student/courses)" }, { name: "body", label: "Message", type: "textarea" }]} />,
   messages: () => <ResourceManager resource="contact-messages" title="Contact messages" canCreate={false} filters={[{ name: "status", label: "Status", options: ["new", "read", "replied"] }]}
-    columns={[{ key: "name", label: "From", render: (r) => <><strong>{r.name}</strong><br /><small className="muted">{r.email} {r.phone}</small></> }, { key: "subject", label: "Subject" }, { key: "message", label: "Message", render: (r) => String(r.message).slice(0, 90) }, { key: "created_at", label: "Date", type: "date" }, { key: "status", label: "Status", type: "status" }]}
+    columns={[{ key: "name", label: "From", render: (r) => <><strong>{r.name}</strong><br /><small className="muted">{r.email} {r.phone}</small></> }, { key: "subject", label: "Subject" }, { key: "message", label: "Message", render: (r) => String(r.message).slice(0, 90) }, { key: "created_at", label: "Date", type: "date" }, { key: "status", label: "Status", type: "status" }, { key: "chat", label: "WhatsApp", render: (r) => r.phone ? <a href={`https://wa.me/${r.phone.replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer" className="btn btn-xs btn-outline">💬 WhatsApp</a> : <span className="muted">—</span> }]}
     fields={[{ name: "name", label: "Name", required: true }, { name: "email", label: "Email", type: "email", required: true }, { name: "phone", label: "Phone" }, { name: "subject", label: "Subject" }, { name: "status", label: "Status", type: "select", options: ["new", "read", "replied"], required: true }, { name: "message", label: "Message", type: "textarea", required: true }]} />,
   inquiries: () => <ResourceManager resource="inquiries" title="Admission inquiries" sub="Call-back requests from the website." filters={[{ name: "status", label: "Status", options: ["new", "contacted", "closed"] }]}
-    columns={[{ key: "name", label: "Name" }, { key: "phone", label: "Phone / email", render: (r) => <>{r.phone}<br /><small className="muted">{r.email}</small></> }, { key: "program", label: "Programme" }, { key: "qualification", label: "Qualification" }, { key: "city", label: "City" }, { key: "created_at", label: "Date", type: "date" }, { key: "status", label: "Status", type: "status" }]}
+    columns={[{ key: "name", label: "Name" }, { key: "phone", label: "Phone / email", render: (r) => <>{r.phone}<br /><small className="muted">{r.email}</small></> }, { key: "program", label: "Programme" }, { key: "qualification", label: "Qualification" }, { key: "city", label: "City" }, { key: "created_at", label: "Date", type: "date" }, { key: "status", label: "Status", type: "status" }, { key: "chat", label: "WhatsApp", render: (r) => r.phone ? <a href={`https://wa.me/${r.phone.replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer" className="btn btn-xs btn-outline">💬 WhatsApp</a> : <span className="muted">—</span> }]}
     fields={[{ name: "name", label: "Name", required: true }, { name: "email", label: "Email", type: "email", required: true }, { name: "phone", label: "Phone", required: true }, { name: "program", label: "Programme" }, { name: "qualification", label: "Qualification" }, { name: "city", label: "City" }, { name: "status", label: "Status", type: "select", options: ["new", "contacted", "closed"], required: true }, { name: "message", label: "Message", type: "textarea" }]} />,
   subscribers: () => <ResourceManager resource="subscribers" title="Newsletter subscribers" columns={[{ key: "email", label: "Email" }, { key: "ip", label: "IP" }, { key: "created_at", label: "Subscribed", type: "date" }]} fields={[{ name: "email", label: "Email", type: "email", required: true }]} />,
   carts: () => <ResourceManager resource="carts" title="Shopping carts" sub="Every cart saved on the website — including carts that were never checked out." canCreate={false} filters={[{ name: "status", label: "Status", options: ["active", "converted"] }]}
@@ -449,4 +502,12 @@ export const simple = {
     filters={[{ name: "action", label: "Action", options: (o) => o.actions || [] }, { name: "method", label: "Method", options: ["GET", "POST", "PUT", "DELETE"] }]}
     columns={[{ key: "created_at", label: "When", type: "date" }, { key: "user", label: "User", render: (r) => r.user ? `${r.user.name} (${r.user.role})` : <span className="muted">Guest {r.visitor_id?.slice(0, 8)}</span>, csv: (r) => r.user?.name || r.visitor_id },
       { key: "action", label: "Action", render: (r) => <span className="tag">{r.action}</span> }, { key: "description", label: "Description", render: (r) => <span className="wrap">{r.description}</span> }, { key: "status_code", label: "HTTP", num: true }, { key: "ip", label: "IP" }]} />,
+  quizAttempts: () => <ResourceManager resource="quiz-attempts" title="Quiz attempts" sub="Every quiz submitted by students, with scores." canCreate={false} filters={[{ name: "passed", label: "Result", options: [["1", "Passed"], ["0", "Not passed"]] }]}
+    columns={[{ key: "user", label: "Student", render: (r) => who(r.user), csv: (r) => r.user?.email }, { key: "quiz", label: "Quiz", render: (r) => <><span className="tag">{r.quiz?.course?.code}</span> {r.quiz?.title}</>, csv: (r) => r.quiz?.title },
+      { key: "score", label: "Score", render: (r) => `${r.score}/${r.total}`, num: true }, { key: "percentage", label: "%", num: true }, { key: "passed", label: "Passed", type: "bool" }, { key: "submitted_at", label: "Submitted", type: "date" }]}
+    fields={[{ name: "score", label: "Score", type: "number" }, { name: "total", label: "Total", type: "number" }, { name: "percentage", label: "Percentage", type: "number" }, { name: "passed", label: "Passed", type: "checkbox" }]} />,
+  messageLogs: () => <ResourceManager resource="message-logs" title="Message log" sub="Every WhatsApp and email the website has sent — with delivery status and errors." canCreate={false} canEdit={false} perPage={50}
+    filters={[{ name: "channel", label: "Channel", options: [["whatsapp", "WhatsApp"], ["email", "Email"]] }, { name: "status", label: "Status", options: ["queued", "sent", "failed", "skipped"] }]}
+    columns={[{ key: "created_at", label: "When", type: "date" }, { key: "channel", label: "Channel", render: (r) => <span className={`tag ${r.channel === "whatsapp" ? "tag-wa" : ""}`}>{r.channel}</span> }, { key: "recipient", label: "To", render: (r) => <>{r.recipient}{r.user && <><br /><small className="muted">{r.user.name}</small></>}</> },
+      { key: "subject", label: "Message", render: (r) => <span className="wrap">{r.subject}</span> }, { key: "status", label: "Status", type: "status" }, { key: "error", label: "Error", render: (r) => r.error ? <span className="wrap small bad-text">{String(r.error).slice(0, 140)}</span> : "—" }]} />,
 };

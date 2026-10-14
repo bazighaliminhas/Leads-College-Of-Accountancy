@@ -28,6 +28,10 @@ class StudentController extends Controller
             'enrollments' => $enrollments,
             'orders' => $u->orders()->with('items')->latest()->limit(5)->get(),
             'announcements' => $this->announcementsFor($u)->limit(5)->get(),
+            'live' => \App\Models\LiveClass::with(['course:id,code,title,slug', 'teacher:id,name'])->whereIn('course_id', $enrollments->filter->hasAccess()->pluck('course_id'))
+                ->where('status', 'scheduled')->where('starts_at', '>=', now()->subHours(3))->orderBy('starts_at')->limit(6)->get()
+                ->map(fn ($lc) => collect($lc->toArray())->except(['google_event_id', 'google_account_id', 'google_event_link'])->all() + ['ics_url' => URL::temporarySignedRoute('files.live-ics', now()->addDays(60), ['liveClass' => $lc->id])]),
+            'quiz_stats' => ['taken' => \App\Models\QuizAttempt::where('user_id', $u->id)->whereNotNull('submitted_at')->distinct('quiz_id')->count('quiz_id'), 'average' => (int) round(\App\Models\QuizAttempt::where('user_id', $u->id)->whereNotNull('submitted_at')->avg('percentage') ?? 0)],
         ]);
     }
 
@@ -53,14 +57,23 @@ class StudentController extends Controller
         }
         $progress = LessonProgress::where('user_id', $request->user()->id)->where('course_id', $course->id)->get()->keyBy('lesson_id');
         $lessons = $course->lessons()->where('is_published', true)->get()->map(fn ($l) => $this->lessonPayload($l, $progress->get($l->id)));
+        $attempts = \App\Models\QuizAttempt::where('user_id', $request->user()->id)->whereNotNull('submitted_at')->get()->groupBy('quiz_id');
+        $quizzes = \App\Models\Quiz::where('course_id', $course->id)->where('is_published', true)->withCount('questions')->orderBy('sort_order')->orderBy('id')->get()
+            ->map(fn ($q) => $q->only(['id', 'lesson_id', 'title', 'description', 'kind', 'time_limit_minutes', 'pass_percentage', 'max_attempts', 'questions_count']) + [
+                'attempts' => $attempts->get($q->id)?->count() ?? 0,
+                'best' => $attempts->get($q->id)?->max('percentage'),
+                'passed' => (bool) $attempts->get($q->id)?->contains('passed', true),
+            ]);
+        $live = \App\Models\LiveClass::with('teacher:id,name')->where('course_id', $course->id)->where('status', 'scheduled')->where('starts_at', '>=', now()->subHours(3))->orderBy('starts_at')->limit(5)->get()
+            ->map(fn ($lc) => collect($lc->toArray())->except(['google_event_id', 'google_account_id', 'google_event_link'])->all() + ['ics_url' => URL::temporarySignedRoute('files.live-ics', now()->addDays(60), ['liveClass' => $lc->id])]);
         Activity::log('learn.open', "Opened course {$course->code}", $course);
-        return response()->json(['course' => $course, 'enrollment' => $enrollment, 'lessons' => $lessons, 'announcements' => Announcement::where('course_id', $course->id)->where('is_published', true)->latest()->get()]);
+        return response()->json(['course' => $course, 'enrollment' => $enrollment, 'lessons' => $lessons, 'quizzes' => $quizzes, 'live' => $live, 'announcements' => Announcement::where('course_id', $course->id)->where('is_published', true)->latest()->get()]);
     }
 
     public static function lessonPayload(Lesson $l, $p = null): array
     {
         $exp = now()->addHours(4);
-        return $l->only(['id', 'chapter', 'title', 'description', 'type', 'video_url', 'content', 'duration_minutes', 'attachment_name', 'sort_order', 'is_published']) + [
+        return $l->only(['id', 'course_id', 'chapter', 'title', 'description', 'type', 'video_url', 'content', 'study_material', 'objectives', 'ai_generated', 'duration_minutes', 'attachment_name', 'sort_order', 'is_published']) + [
             'video_src' => $l->video_path ? URL::temporarySignedRoute('files.lesson', $exp, ['lesson' => $l->id, 'kind' => 'video']) : null,
             'attachment_src' => $l->attachment_path ? URL::temporarySignedRoute('files.lesson', $exp, ['lesson' => $l->id, 'kind' => 'attachment']) : null,
             'completed' => (bool) $p?->completed_at,

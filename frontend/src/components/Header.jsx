@@ -11,6 +11,14 @@ export default function Header() {
   const loc = useLocation();
   const nav = useNavigate();
   useEffect(() => { setOpen(false); setDrop(null); }, [loc.pathname, loc.search]);
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
 
   const programs = site?.programs || [];
   const portal = user ? `/${user.role}` : "/login";
@@ -28,6 +36,7 @@ export default function Header() {
         </div>
       </div>
       <div className="nav-wrap">
+        <div className={`menu-backdrop ${open ? "show" : ""}`} onClick={() => setOpen(false)} aria-hidden="true" />
         <div className="container nav">
           <Link to="/" className="brand" aria-label="Leads College of Accountancy — home"><Logo /></Link>
 

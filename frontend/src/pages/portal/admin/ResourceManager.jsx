@@ -126,6 +126,8 @@ export function AutoForm({ resource, row, fields, fixed = {}, onSaved }) {
     if (f.type === "checkbox") v = v === undefined ? !!f.default : !!v;
     if (f.type === "password" || f.type === "file" || f.type === "image") v = "";
     if (f.type === "date" && v) v = String(v).slice(0, 10);
+    if (f.type === "courses") v = (row.teaching_courses || []).map((c) => c.id);
+    if (f.type === "datetime" && v) v = String(v).slice(0, 16);
     init[f.name] = v ?? f.default ?? "";
   });
   const [form, setForm] = useState(init);
@@ -143,6 +145,7 @@ export function AutoForm({ resource, row, fields, fixed = {}, onSaved }) {
       if (f.type === "file" || f.type === "image") { if (v instanceof File) fd.append(f.name, v); continue; }
       if (f.type === "password" && !v) continue;
       if (f.type === "checkbox") { fd.append(f.name, v ? "1" : "0"); continue; }
+      if (f.type === "courses") { fd.append(f.name, JSON.stringify(v || [])); continue; }
       if (f.type === "lines") { const arr = String(v || "").split("\n").map((x) => x.trim()).filter(Boolean); fd.append(f.name, JSON.stringify(arr)); continue; }
       if (f.type === "json") { if (v) fd.append(f.name, v); continue; }
       fd.append(f.name, v ?? "");
@@ -177,6 +180,23 @@ function Input({ f, value, onChange, opts, row, form }) {
     case "checkbox": return <label className="check"><input type="checkbox" checked={!!value} onChange={(e) => onChange(e.target.checked)} /> {f.checkLabel || "Yes"}</label>;
     case "file": case "image": return <input type="file" accept={f.type === "image" ? "image/*" : f.accept} onChange={(e) => onChange(e.target.files?.[0] || "")} />;
     case "number": return <input type="number" step="any" {...common} />;
+    case "datetime": return <input type="datetime-local" {...common} />;
+    case "courses": {
+      const sel = value || [];
+      const flip = (id) => onChange(sel.includes(id) ? sel.filter((x) => x !== id) : [...sel, id]);
+      return (
+        <div className="course-picker">
+          {(opts.programs || []).map((p) => (
+            <div key={p.id} className="cp-group"><span className="cp-title">{p.name}</span>
+              <div className="cp-chips">{(opts.courses || []).filter((c) => c.program_id === p.id).map((c) => (
+                <button type="button" key={c.id} className={`chip ${sel.includes(c.id) ? "on" : ""}`} onClick={() => flip(c.id)} title={c.title}>{c.code}</button>
+              ))}</div>
+            </div>
+          ))}
+          <small className="muted">{sel.length ? `${sel.length} course${sel.length > 1 ? "s" : ""} selected` : "No course selected yet"}</small>
+        </div>
+      );
+    }
     case "date": return <input type="date" {...common} />;
     case "email": return <input type="email" {...common} />;
     case "password": return <input type="password" autoComplete="new-password" {...common} />;

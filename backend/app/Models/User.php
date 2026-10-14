@@ -37,5 +37,7 @@ class User extends Authenticatable
     public function enrollments() { return $this->hasMany(Enrollment::class); }
     public function orders() { return $this->hasMany(Order::class); }
     public function payments() { return $this->hasMany(Payment::class); }
+    public function googleAccount() { return $this->hasOne(GoogleAccount::class); }
+    public function quizAttempts() { return $this->hasMany(QuizAttempt::class); }
     public function userNotifications() { return $this->hasMany(UserNotification::class); }
 }

@@ -4,13 +4,24 @@ namespace Database\Seeders;
 
 use App\Models\Announcement;
 use App\Models\Course;
+use App\Models\Enrollment;
 use App\Models\ExamSession;
 use App\Models\Lesson;
+use App\Models\LessonProgress;
 use App\Models\Level;
+use App\Models\LiveClass;
+use App\Models\MessageLog;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Payment;
 use App\Models\PaymentAccount;
 use App\Models\Program;
+use App\Models\Quiz;
+use App\Models\QuizAttempt;
+use App\Models\QuizQuestion;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\UserNotification;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -94,6 +105,295 @@ class DatabaseSeeder extends Seeder
 
         if (!Announcement::exists()) {
             Announcement::create(['user_id' => $admin->id, 'audience' => 'all', 'title' => 'Welcome to the LCA learning portal', 'body' => 'Your courses appear under "My Courses" once the admin grants access after verifying your payment.', 'is_published' => true]);
+        }
+
+        // ---------- Demo Student Enrolment, Order & Payment (ACCA FA1) ----------
+        $student = User::where('email', 'student@leads.edu.pk')->first();
+        $fa1 = Course::where('code', 'FA1')->first();
+        $accaSession = ExamSession::where('program_id', $acca->id)->first();
+
+        if ($student && $fa1) {
+            $order = Order::firstOrCreate(['order_no' => 'LCA-DEMO-00001'], [
+                'user_id' => $student->id,
+                'subtotal' => $fa1->fee ?? 15000,
+                'registration_fee' => 15000,
+                'total' => ($fa1->fee ?? 15000) + 15000,
+                'status' => 'approved',
+                'first_name' => 'Demo',
+                'last_name' => 'Student',
+                'email' => 'student@leads.edu.pk',
+                'phone' => '+923000000000',
+                'dob' => '2002-05-15',
+                'cnic' => '35201-1234567-1',
+                'city' => 'Lahore',
+                'country' => 'Pakistan',
+                'address' => 'Model Town, Lahore',
+                'registration_no' => 'ACCA-9876543',
+                'qualification' => 'Intermediate / A Levels',
+                'agreed_terms_at' => now(),
+                'reviewed_by' => $admin->id,
+                'reviewed_at' => now(),
+                'admin_remarks' => 'Verified by Admissions Office',
+            ]);
+
+            OrderItem::firstOrCreate(['order_id' => $order->id, 'item_type' => 'course'], [
+                'course_id' => $fa1->id,
+                'exam_session_id' => $accaSession?->id,
+                'code' => $fa1->code,
+                'title' => $fa1->title,
+                'session_name' => $accaSession?->name,
+                'price' => $fa1->fee ?? 15000,
+            ]);
+
+            OrderItem::firstOrCreate(['order_id' => $order->id, 'item_type' => 'registration_fee'], [
+                'code' => 'REG-ACCA',
+                'title' => 'ACCA Admission Registration Fee',
+                'price' => 15000,
+            ]);
+
+            Payment::firstOrCreate(['order_id' => $order->id], [
+                'user_id' => $student->id,
+                'method' => 'Bank transfer',
+                'paid_from' => 'HBL',
+                'account_title' => 'Demo Student',
+                'account_number' => '0123456789',
+                'paid_to' => 'Leads College of Accountancy',
+                'transaction_ref' => 'HBL-TXN-998877',
+                'amount' => $order->total,
+                'paid_on' => now()->toDateString(),
+                'screenshot_path' => 'payments/demo-receipt.png',
+                'screenshot_name' => 'receipt.png',
+                'status' => 'verified',
+                'verified_by' => $admin->id,
+                'verified_at' => now(),
+                'remarks' => 'Bank transfer verified.',
+            ]);
+
+            Enrollment::updateOrCreate(['user_id' => $student->id, 'course_id' => $fa1->id], [
+                'order_id' => $order->id,
+                'exam_session_id' => $accaSession?->id,
+                'status' => 'active',
+                'granted_by' => $admin->id,
+                'granted_at' => now(),
+                'access_expires_on' => now()->addYear(),
+                'progress' => 50,
+            ]);
+
+            $lesson = $fa1->lessons()->first();
+            if ($lesson) {
+                $lesson->update([
+                    'chapter' => 'Chapter 1 — Introduction to Financial Accounting',
+                    'title' => 'Lecture 1 — The Fundamentals of Accounting & Double Entry',
+                    'duration_minutes' => 45,
+                    'ai_generated' => true,
+                    'objectives' => [
+                        'Understand the purpose of financial records in business',
+                        'State and explain the fundamental accounting equation',
+                        'Apply the rules of debit and credit to simple transactions',
+                        'Differentiate between assets, liabilities, income, and expenses',
+                    ],
+                    'study_material' => "## Overview\n\nFinancial accounting is the process of identifying, measuring, recording, and communicating economic information about an entity to external decision-makers such as investors, lenders, tax authorities, and regulators.\n\n## The Accounting Equation\n\nThe fundamental accounting equation forms the foundation of all double-entry bookkeeping:\n\n$$\\text{Assets} = \\text{Liabilities} + \\text{Capital (Equity)}$$\n\n- **Assets**: Economic resources owned or controlled by the business that generate future economic benefits (e.g. cash, inventory, receivables, equipment).\n- **Liabilities**: Present obligations resulting from past events, the settlement of which is expected to result in an outflow of resources (e.g. bank loans, trade payables).\n- **Capital**: The owner's residual interest in the business after deducting all liabilities.\n\n## Double Entry Rules (D.E.A.D. C.L.I.C.)\n\n- **Debit increases**: **D**rawings, **E**xpenses, **A**ssets\n- **Credit increases**: **C**apital, **L**iabilities, **I**ncome\n\n## Worked Example\n\n**Scenario:**\nMr. Ali starts a business on 1 January with PKR 500,000 cash and purchases inventory on credit for PKR 120,000 from Supplier XYZ.\n\n| Transaction | Debit Account | Credit Account | Amount (PKR) |\n|---|---|---|---|\n| Introduce initial capital | Cash (Asset +) | Capital (Equity +) | 500,000 |\n| Purchase inventory on credit | Inventory (Asset +) | Trade Payables (Liability +) | 120,000 |\n\n## Common Mistakes\n1. Treating purchases of goods for resale as an immediate reduction in capital instead of recording inventory or purchases.\n2. Confusing trade receivables (assets) with trade payables (liabilities).\n\n## Quick Recap\n- Every transaction has a dual effect.\n- Total debits must always equal total credits in a trial balance.\n- Assets = Liabilities + Capital.\n",
+                ]);
+
+                \App\Models\LessonProgress::updateOrCreate(['user_id' => $student->id, 'lesson_id' => $lesson->id], [
+                    'course_id' => $fa1->id,
+                    'views' => 3,
+                    'last_position_seconds' => 1200,
+                    'completed_at' => now(),
+                ]);
+            }
+
+            // ---------- Live Class (Google Meet) ----------
+            LiveClass::firstOrCreate(['course_id' => $fa1->id, 'title' => 'Live Class: Mastering Trial Balance & Suspense Accounts'], [
+                'teacher_id' => $accaT->id,
+                'description' => 'Interactive revision on identifying errors not affecting the trial balance, posting journal entries, and clearing suspense accounts before exam sessions.',
+                'starts_at' => now()->addDays(2)->setTime(18, 0, 0),
+                'duration_minutes' => 60,
+                'meet_link' => 'https://meet.google.com/abc-defg-hij',
+                'link_source' => 'manual',
+                'status' => 'scheduled',
+                'created_by' => $accaT->id,
+                'notified_at' => now(),
+            ]);
+
+            // ---------- Quiz (MCQs + Short Answer) ----------
+            $quiz = Quiz::firstOrCreate(['course_id' => $fa1->id, 'title' => 'FA1 Chapter 1 Practice Assessment'], [
+                'lesson_id' => $lesson?->id,
+                'kind' => 'mixed',
+                'description' => 'Test your understanding of the accounting equation, asset classifications, and double entry fundamentals.',
+                'time_limit_minutes' => 15,
+                'pass_percentage' => 50,
+                'max_attempts' => 3,
+                'difficulty' => 'exam',
+                'is_published' => true,
+                'ai_generated' => true,
+                'sort_order' => 1,
+                'created_by' => $accaT->id,
+            ]);
+
+            $questions = [
+                [
+                    'type' => 'mcq',
+                    'question' => 'Which of the following is classified as a non-current asset for a retailer?',
+                    'options' => ['Inventory held for sale', 'Trade receivables', 'Delivery van used for goods delivery', 'Bank overdraft balance'],
+                    'correct_index' => 2,
+                    'explanation' => 'Delivery van is a tangible long-term asset expected to be used for more than one operating cycle.',
+                    'marks' => 1,
+                ],
+                [
+                    'type' => 'mcq',
+                    'question' => 'If total assets are PKR 800,000 and total liabilities are PKR 350,000, what is the value of capital (equity)?',
+                    'options' => ['PKR 450,000', 'PKR 1,150,000', 'PKR 350,000', 'PKR 500,000'],
+                    'correct_index' => 0,
+                    'explanation' => 'Capital = Assets - Liabilities = 800,000 - 350,000 = PKR 450,000.',
+                    'marks' => 1,
+                ],
+                [
+                    'type' => 'mcq',
+                    'question' => 'A business receives PKR 25,000 cash from a trade receivable. What is the double entry?',
+                    'options' => [
+                        'Debit Trade Payables, Credit Cash',
+                        'Debit Cash, Credit Trade Receivables',
+                        'Debit Trade Receivables, Credit Sales',
+                        'Debit Cash, Credit Capital'
+                    ],
+                    'correct_index' => 1,
+                    'explanation' => 'Cash increases (debit asset) and Trade Receivables decreases (credit asset).',
+                    'marks' => 1,
+                ],
+                [
+                    'type' => 'short',
+                    'question' => 'Explain why the purchase of office equipment is classified as capital expenditure rather than revenue expenditure.',
+                    'options' => null,
+                    'correct_index' => null,
+                    'answer' => 'Capital expenditure provides economic benefits to the business over multiple accounting periods (longer than 12 months) and results in the recognition of a non-current asset on the Statement of Financial Position, whereas revenue expenditure is consumed within the current period to maintain day-to-day operations.',
+                    'explanation' => 'Award up to 3 marks: 1 mark for long-term benefit (>12 months), 1 mark for asset recognition, 1 mark for contrast with current-period consumption.',
+                    'marks' => 3,
+                ],
+            ];
+
+            foreach ($questions as $qi => $q) {
+                \App\Models\QuizQuestion::firstOrCreate(['quiz_id' => $quiz->id, 'question' => $q['question']], [
+                    'type' => $q['type'],
+                    'options' => $q['options'],
+                    'correct_index' => $q['correct_index'],
+                    'answer' => $q['answer'] ?? null,
+                    'explanation' => $q['explanation'],
+                    'marks' => $q['marks'],
+                    'sort_order' => $qi + 1,
+                ]);
+            }
+
+            // Sample Quiz Attempt
+            \App\Models\QuizAttempt::firstOrCreate(['quiz_id' => $quiz->id, 'user_id' => $student->id], [
+                'answers' => [1 => 2, 2 => 0, 3 => 1, 4 => 'Capital expenditure benefits the business over multiple years and increases non-current assets.'],
+                'results' => [
+                    1 => ['correct' => true, 'marks' => 1],
+                    2 => ['correct' => true, 'marks' => 1],
+                    3 => ['correct' => true, 'marks' => 1],
+                    4 => ['score' => 3, 'feedback' => 'Clear and accurate explanation distinguishing multi-period benefits.'],
+                ],
+                'score' => 6,
+                'total' => 6,
+                'percentage' => 100,
+                'passed' => true,
+                'started_at' => now()->subDay(),
+                'submitted_at' => now()->subDay()->addMinutes(12),
+            ]);
+
+            // Sample Notification
+            \App\Models\UserNotification::firstOrCreate(['user_id' => $student->id, 'title' => 'Admission Confirmed — FA1 Access Granted'], [
+                'type' => 'success',
+                'body' => 'Your payment for Order LCA-DEMO-00001 has been verified and course access is granted. Welcome to Leads College of Accountancy!',
+                'link' => '/student/courses',
+                'read_at' => null,
+            ]);
+
+            // Sample Message Log (WhatsApp & Email)
+            \App\Models\MessageLog::firstOrCreate(['recipient' => '+923000000000', 'channel' => 'whatsapp'], [
+                'user_id' => $student->id,
+                'subject' => 'Admission Confirmed',
+                'body' => "Dear Demo Student,\nYour admission for FA1 is approved! Access your dashboard at http://127.0.0.1:8000/student",
+                'status' => 'sent',
+                'sent_at' => now(),
+            ]);
+
+            \App\Models\MessageLog::firstOrCreate(['recipient' => 'student@leads.edu.pk', 'channel' => 'email'], [
+                'user_id' => $student->id,
+                'subject' => 'Course Access Granted — Leads College of Accountancy',
+                'body' => 'Your payment has been verified. You can now access your lectures, quizzes and live classes.',
+                'status' => 'sent',
+                'sent_at' => now(),
+            ]);
+        }
+
+        // ---------- CA Teacher Sample Live Class & Quiz (CAF-1) ----------
+        $caf1 = Course::where('code', 'CAF-1')->first() ?? Course::where('code', 'PRC-01')->first();
+        if ($caf1 && $caT) {
+            LiveClass::firstOrCreate(['course_id' => $caf1->id, 'title' => 'CAF-1: Revenue Recognition & IFRS 15 Principles'], [
+                'teacher_id' => $caT->id,
+                'description' => 'Five-step model for revenue recognition under IFRS 15 with ICAP exam-standard past paper questions.',
+                'starts_at' => now()->addDays(3)->setTime(19, 0, 0),
+                'duration_minutes' => 75,
+                'meet_link' => 'https://meet.google.com/xyz-uvwx-rst',
+                'link_source' => 'manual',
+                'status' => 'scheduled',
+                'created_by' => $caT->id,
+                'notified_at' => now(),
+            ]);
+
+            $caQuiz = Quiz::firstOrCreate(['course_id' => $caf1->id, 'title' => 'CAF-1 Accounting Standards Checkpoint'], [
+                'kind' => 'mcq',
+                'description' => 'Comprehensive checkpoint on IAS 16 Property, Plant and Equipment and IAS 2 Inventories.',
+                'time_limit_minutes' => 20,
+                'pass_percentage' => 50,
+                'max_attempts' => 3,
+                'difficulty' => 'exam',
+                'is_published' => true,
+                'ai_generated' => true,
+                'sort_order' => 1,
+                'created_by' => $caT->id,
+            ]);
+
+            $caQuestions = [
+                [
+                    'type' => 'mcq',
+                    'question' => 'Under IAS 2, how should inventories be measured?',
+                    'options' => [
+                        'At cost',
+                        'At net realizable value (NRV)',
+                        'At the lower of cost and net realizable value (NRV)',
+                        'At replacement value'
+                    ],
+                    'correct_index' => 2,
+                    'explanation' => 'IAS 2 requires inventories to be measured at the lower of cost and net realizable value.',
+                    'marks' => 2,
+                ],
+                [
+                    'type' => 'mcq',
+                    'question' => 'Which of the following costs is NOT capitalized under IAS 16 as part of Property, Plant and Equipment?',
+                    'options' => [
+                        'Site preparation costs',
+                        'Initial delivery and handling costs',
+                        'Professional fees directly related to the acquisition',
+                        'Costs of opening a new facility or advertising'
+                    ],
+                    'correct_index' => 3,
+                    'explanation' => 'Costs of opening a new facility and advertising are recognized in profit or loss when incurred.',
+                    'marks' => 2,
+                ]
+            ];
+
+            foreach ($caQuestions as $qi => $q) {
+                \App\Models\QuizQuestion::firstOrCreate(['quiz_id' => $caQuiz->id, 'question' => $q['question']], [
+                    'type' => $q['type'],
+                    'options' => $q['options'],
+                    'correct_index' => $q['correct_index'],
+                    'explanation' => $q['explanation'],
+                    'marks' => $q['marks'],
+                    'sort_order' => $qi + 1,
+                ]);
+            }
         }
     }
 }

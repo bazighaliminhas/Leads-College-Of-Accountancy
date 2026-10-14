@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models;
 use App\Support\Activity;
+use App\Support\Notify;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -27,13 +29,13 @@ class AdminResourceController extends Controller
                 'model' => Models\User::class,
                 'search' => ['name', 'email', 'username', 'phone', 'registration_no', 'city'],
                 'filters' => ['role', 'status'],
-                'with' => [],
+                'with' => ['teachingCourses:id,code,title'],
                 'files' => ['avatar' => 'public:avatars'],
                 'rules' => [
                     'first_name' => 'required|string|max:80', 'last_name' => 'nullable|string|max:80',
                     'username' => ['required', 'alpha_dash', 'max:40', Rule::unique('users', 'username')->ignore($id)],
                     'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($id)],
-                    'password' => ($id ? 'nullable' : 'required').'|string|min:6',
+                    'password' => ($id ? 'nullable' : 'required').'|string|min:8',
                     'role' => 'required|in:admin,teacher,student', 'status' => 'required|in:active,blocked',
                     'phone' => 'nullable|max:30', 'father_name' => 'nullable|max:120', 'dob' => 'nullable|date', 'gender' => 'nullable|max:20', 'cnic' => 'nullable|max:20',
                     'city' => 'nullable|max:80', 'country' => 'nullable|max:80', 'address' => 'nullable|max:500', 'qualification' => 'nullable|max:150',
@@ -91,6 +93,18 @@ class AdminResourceController extends Controller
                 'instructions' => 'nullable', 'is_active' => 'boolean', 'sort_order' => 'nullable|integer']],
             'settings' => ['model' => Models\Setting::class, 'search' => ['key', 'label', 'value'], 'filters' => ['group'], 'rules' => [
                 'key' => ['required', 'max:100', Rule::unique('settings', 'key')->ignore($id)], 'value' => 'nullable', 'group' => 'required|max:50', 'label' => 'nullable|max:150']],
+            'live-classes' => ['model' => Models\LiveClass::class, 'search' => ['title', 'meet_link'], 'filters' => ['course_id', 'teacher_id', 'status', 'link_source'], 'with' => ['course:id,code,title', 'teacher:id,name'], 'rules' => [
+                'course_id' => 'required|exists:courses,id', 'teacher_id' => 'nullable|exists:users,id', 'title' => 'required|max:200', 'description' => 'nullable', 'starts_at' => 'required|date',
+                'duration_minutes' => 'nullable|integer|min:10|max:600', 'meet_link' => 'nullable|url|max:500', 'status' => 'required|in:draft,scheduled,completed,cancelled', 'recording_url' => 'nullable|url|max:500']],
+            'quizzes' => ['model' => Models\Quiz::class, 'search' => ['title'], 'filters' => ['course_id', 'lesson_id', 'kind', 'is_published'], 'with' => ['course:id,code,title', 'lesson:id,title', 'creator:id,name'], 'counts' => ['questions', 'attempts'], 'rules' => [
+                'course_id' => 'required|exists:courses,id', 'lesson_id' => 'nullable|exists:lessons,id', 'title' => 'required|max:200', 'kind' => 'nullable|in:mcq,short,mixed', 'description' => 'nullable',
+                'time_limit_minutes' => 'nullable|integer|min:1', 'pass_percentage' => 'nullable|integer|min:0|max:100', 'max_attempts' => 'nullable|integer|min:1', 'is_published' => 'boolean']],
+            'quiz-questions' => ['model' => Models\QuizQuestion::class, 'search' => ['question'], 'filters' => ['quiz_id', 'type'], 'with' => ['quiz:id,title,course_id'], 'rules' => [
+                'quiz_id' => 'required|exists:quizzes,id', 'type' => 'required|in:mcq,short', 'question' => 'required', 'options' => 'nullable|array', 'correct_index' => 'nullable|integer|min:0|max:7',
+                'answer' => 'nullable', 'explanation' => 'nullable', 'marks' => 'nullable|integer|min:1', 'sort_order' => 'nullable|integer']],
+            'quiz-attempts' => ['model' => Models\QuizAttempt::class, 'filters' => ['quiz_id', 'user_id', 'passed'], 'with' => ['quiz:id,title,course_id', 'quiz.course:id,code', 'user:id,name,email'], 'searchRel' => ['user' => ['name', 'email'], 'quiz' => ['title']], 'rules' => [
+                'score' => 'nullable|numeric', 'total' => 'nullable|numeric', 'percentage' => 'nullable|integer|min:0|max:100', 'passed' => 'boolean']],
+            'message-logs' => ['model' => Models\MessageLog::class, 'search' => ['recipient', 'subject', 'body'], 'filters' => ['channel', 'status', 'user_id'], 'with' => ['user:id,name'], 'readonly' => true],
             'activity-logs' => ['model' => Models\ActivityLog::class, 'search' => ['action', 'description', 'ip', 'url'], 'filters' => ['action', 'user_id', 'method'], 'with' => ['user:id,name,role'], 'readonly' => true],
         ];
     }
@@ -116,7 +130,8 @@ class AdminResourceController extends Controller
             });
         }
         $sort = $request->input('sort', 'id');
-        $q->orderBy(preg_match('/^[a-z_]+$/', $sort) ? $sort : 'id', $request->input('dir') === 'asc' ? 'asc' : 'desc');
+        $table = (new $c['model'])->getTable();
+        $q->orderBy(preg_match('/^[a-z_]+$/', $sort) && Schema::hasColumn($table, $sort) ? $sort : 'id', $request->input('dir') === 'asc' ? 'asc' : 'desc');
         $per = min((int) $request->input('per_page', 25), 500);
         return response()->json($q->paginate($per));
     }
@@ -172,8 +187,10 @@ class AdminResourceController extends Controller
             elseif (!$request->hasFile($field)) unset($data[$field]);
         }
 
+        $plainPassword = $request->input('password');
         if ($resource === 'users') {
             if (empty($data['password'])) unset($data['password']);
+            if (($data['role'] ?? $model->role) === 'student') unset($data['course_ids']);
             if (isset($data['first_name']) || isset($data['last_name'])) $data['name'] = trim(($data['first_name'] ?? $model->first_name).' '.($data['last_name'] ?? $model->last_name));
             if (!$id) $data['created_by'] = $request->user()->id;
             if ($id === $request->user()->id && isset($data['status']) && $data['status'] !== 'active') abort(422, 'You cannot block your own account.');
@@ -186,6 +203,24 @@ class AdminResourceController extends Controller
 
         $model->fill($data)->save();
         if ($resource === 'users' && $id && isset($data['password'])) $model->tokens()->delete(); // force re-login after admin password reset
+        if ($resource === 'users' && $id && ($data['status'] ?? null) === 'blocked') $model->tokens()->delete();
+
+        // Teachers: the courses they teach are chosen right in the teacher form
+        if ($resource === 'users' && $model->role === 'teacher' && $request->has('course_ids')) {
+            $ids = collect(is_array($request->course_ids) ? $request->course_ids : (json_decode((string) $request->course_ids, true) ?: []))->map(fn ($x) => (int) $x)->filter()->unique();
+            $ids = Models\Course::whereIn('id', $ids)->pluck('id');
+            $changes = $model->teachingCourses()->sync($ids->mapWithKeys(fn ($cid) => [$cid => ['assigned_by' => $request->user()->id, 'can_upload' => true]])->all());
+            if ($id && $changes['attached']) Notify::coursesAssigned($model, Models\Course::whereIn('id', $changes['attached'])->get());
+        }
+        if ($resource === 'users' && $model->role === 'teacher' && $request->boolean('send_credentials')) {
+            Notify::teacherWelcome($model, $plainPassword ?: null);
+        }
+        if ($resource === 'notifications' && !$id) {
+            // Admin-written notification: also deliver it on WhatsApp + email
+            $u = Models\User::find($model->user_id);
+            if ($u) Notify::user($u, ['title' => $model->title, 'body' => $model->body, 'link' => $model->link, 'type' => $model->type ?: 'info', 'dashboard' => false]);
+        }
+        if (in_array($resource, ['programs', 'levels', 'courses', 'exam-sessions', 'payment-accounts', 'settings', 'users', 'course-teachers'])) PublicController::flushCache();
         if ($resource === 'enrollments' && isset($data['status']) && ($before['status'] ?? null) !== $data['status']) AdminController::notifyEnrollment($model);
 
         Activity::log("admin.$resource.".($id ? 'update' : 'create'), 'Admin '.($id ? 'updated' : 'created')." $resource #{$model->id}", $model, ['before' => $before, 'after' => Activity::clean($data)]);
@@ -199,8 +234,10 @@ class AdminResourceController extends Controller
         if ($resource === 'users' && $m->id === $request->user()->id) abort(422, 'You cannot delete your own account.');
         if ($resource === 'lessons') TeacherController::deleteLessonFiles($m);
         if ($resource === 'payments' && $m->screenshot_path) Storage::disk('local')->delete($m->screenshot_path);
+        if ($resource === 'live-classes') { try { \App\Support\GoogleCalendar::delete($m, $m->status === 'scheduled'); } catch (\Throwable $e) { report($e); } }
         Activity::log("admin.$resource.delete", "Admin deleted $resource #$id", $m, ['record' => $m->toArray()]);
         $m->delete();
+        PublicController::flushCache();
         return response()->json(['ok' => true]);
     }
 
@@ -212,7 +249,7 @@ class AdminResourceController extends Controller
             if (!is_string($v)) continue;
             if ($v === '') $request->merge([$k => null]);
             elseif ($v === 'true' || $v === 'false') $request->merge([$k => $v === 'true']);
-            elseif (in_array($k, ['learn', 'structure', 'overview'], true) && str_starts_with(trim($v), '[')) $request->merge([$k => json_decode($v, true)]);
+            elseif (in_array($k, ['learn', 'structure', 'overview', 'options', 'course_ids', 'objectives'], true) && str_starts_with(trim($v), '[')) $request->merge([$k => json_decode($v, true)]);
         }
     }
 }
